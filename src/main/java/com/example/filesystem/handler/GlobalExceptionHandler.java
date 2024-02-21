@@ -12,7 +12,7 @@ import java.io.FileNotFoundException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(FileNotFoundException.class)
+    @ExceptionHandler(LoadFileException.class)
     public ResponseEntity<Object> handleLoadFileException(LoadFileException ex) {
         return new ResponseEntity<>("Error: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
