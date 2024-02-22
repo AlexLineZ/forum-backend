@@ -3,7 +3,7 @@ minio:
   secretKey: secretkey
   endpoint: http://localhost:9000
   bucket:
-    name: myBucketName
+    name: ilovehitsandbackend
 
 spring:
   jpa:
