@@ -8,9 +8,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.util.Date;
 import java.util.UUID;
 
-@MappedSuperclass
+@Entity
+@Table(name = "topics")
 @Data
-public abstract class BaseEntity {
+public class ForumTopic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
@@ -24,4 +25,9 @@ public abstract class BaseEntity {
     private Date modifiedAt;
 
     private String createdBy;
+
+    private String name;
+
+    @ManyToOne
+    private ForumTopic topic;
 }
