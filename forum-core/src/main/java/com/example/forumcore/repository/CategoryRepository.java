@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface CategoryRepository extends JpaRepository<Category, UUID> {
     @Query("SELECT c FROM Category c WHERE LOWER(c.name) LIKE LOWER(CONCAT('%',:name,'%'))")
     List<Category> findByNameContainingIgnoreCase(@Param("name") String name);
+
+    List<Category> findByParentCategoryId(UUID parentCategoryId);
 }

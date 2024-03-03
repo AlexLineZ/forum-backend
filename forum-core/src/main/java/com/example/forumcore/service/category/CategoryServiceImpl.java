@@ -49,6 +49,11 @@ public class CategoryServiceImpl implements CategoryService {
         if (!categoryRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found");
         }
+        List<Category> children = categoryRepository.findByParentCategoryId(id);
+        for (Category child : children) {
+            child.setParentCategory(null);
+            categoryRepository.save(child);
+        }
         categoryRepository.deleteById(id);
     }
 
