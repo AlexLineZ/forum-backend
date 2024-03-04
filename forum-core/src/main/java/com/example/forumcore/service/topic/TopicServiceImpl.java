@@ -1,5 +1,6 @@
 package com.example.forumcore.service.topic;
 
+import com.example.forumcore.dto.CustomPage;
 import com.example.forumcore.dto.request.topic.TopicRequest;
 import com.example.forumcore.dto.response.TopicResponse;
 import com.example.forumcore.entity.Topic;
@@ -8,6 +9,7 @@ import com.example.forumcore.repository.CategoryRepository;
 import com.example.forumcore.repository.TopicRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -61,23 +63,19 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public Page<TopicResponse> getTopics(int page, int size) {
+    public CustomPage<TopicResponse> getTopics(int page, int size) {
         Page<Topic> topics = topicRepository.findAll(PageRequest.of(page, size));
-        List<TopicResponse> content = topics.getContent().stream()
-                .map(topic -> new TopicResponse(
-                        topic.getId(),
-                        topic.getName(),
-                        topic.getCreatedAt(),
-                        topic.getModifiedAt(),
-                        topic.getCreatedBy(),
-                        topic.getCategory().getId()))
-                .toList();
-        return new PageImpl<>(content, topics.getPageable(), topics.getTotalElements());
+        return getTopicResponseCustomPage(topics);
     }
 
     @Override
-    public Page<TopicResponse> searchTopicsByName(String name, int page, int size) {
+    public CustomPage<TopicResponse> searchTopicsByName(String name, int page, int size) {
         Page<Topic> topics = topicRepository.findBySubstringInName(name, PageRequest.of(page, size));
+        return getTopicResponseCustomPage(topics);
+    }
+
+    @NotNull
+    private CustomPage<TopicResponse> getTopicResponseCustomPage(Page<Topic> topics) {
         List<TopicResponse> content = topics.getContent().stream()
                 .map(topic -> new TopicResponse(
                         topic.getId(),
@@ -87,6 +85,6 @@ public class TopicServiceImpl implements TopicService {
                         topic.getCreatedBy(),
                         topic.getCategory().getId()))
                 .toList();
-        return new PageImpl<>(content, topics.getPageable(), topics.getTotalElements());
+        return new CustomPage<>(content, topics.getNumber(), topics.getSize(), topics.getTotalElements());
     }
 }

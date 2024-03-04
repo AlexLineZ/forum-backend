@@ -1,5 +1,6 @@
 package com.example.forumcore.controller;
 
+import com.example.forumcore.dto.CustomPage;
 import com.example.forumcore.dto.request.topic.TopicRequest;
 import com.example.forumcore.dto.response.TopicResponse;
 import com.example.forumcore.entity.Topic;
@@ -41,14 +42,14 @@ public class TopicController {
 
     @Operation(summary = "Получить страницу тем форума")
     @GetMapping
-    public ResponseEntity<Page<TopicResponse>> getTopics(@RequestParam(defaultValue = "0") int page,
-                                                         @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<CustomPage<TopicResponse>> getTopics(@RequestParam(defaultValue = "0") int page,
+                                                               @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(topicService.getTopics(page, size));
     }
 
     @Operation(summary = "Найти темы по названию")
     @GetMapping("/search")
-    public ResponseEntity<Page<TopicResponse>> searchTopicsByName(@RequestParam String name,
+    public ResponseEntity<CustomPage<TopicResponse>> searchTopicsByName(@RequestParam String name,
                                                                @RequestParam(defaultValue = "0") int page,
                                                                @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(topicService.searchTopicsByName(name, page, size));
