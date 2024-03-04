@@ -10,9 +10,9 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Table(name = "messages")
+@Table(name = "topics")
 @Data
-public class ForumMessage {
+public class Topic {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
@@ -28,9 +28,8 @@ public class ForumMessage {
 
     private String createdBy;
 
-    @Lob
-    private String text;
+    private String name;
 
     @ManyToOne
-    private ForumTopic topic;
+    private Category category;
 }

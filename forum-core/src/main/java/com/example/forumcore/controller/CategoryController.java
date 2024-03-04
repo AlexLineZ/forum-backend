@@ -1,7 +1,7 @@
 package com.example.forumcore.controller;
 
-import com.example.forumcore.dto.request.CategoryCreateRequest;
-import com.example.forumcore.dto.request.CategoryUpdateRequest;
+import com.example.forumcore.dto.request.category.CategoryCreateRequest;
+import com.example.forumcore.dto.request.category.CategoryUpdateRequest;
 import com.example.forumcore.dto.response.CategoryResponse;
 import com.example.forumcore.service.category.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;

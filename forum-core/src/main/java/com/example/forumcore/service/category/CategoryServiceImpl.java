@@ -1,11 +1,10 @@
 package com.example.forumcore.service.category;
 
-import com.example.forumcore.dto.request.CategoryCreateRequest;
-import com.example.forumcore.dto.request.CategoryUpdateRequest;
+import com.example.forumcore.dto.request.category.CategoryCreateRequest;
+import com.example.forumcore.dto.request.category.CategoryUpdateRequest;
 import com.example.forumcore.dto.response.CategoryResponse;
 import com.example.forumcore.entity.Category;
 import com.example.forumcore.repository.CategoryRepository;
-import com.example.forumcore.service.category.CategoryService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
