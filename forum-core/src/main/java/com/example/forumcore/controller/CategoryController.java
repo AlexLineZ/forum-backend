@@ -4,9 +4,11 @@ import com.example.forumcore.dto.request.category.CategoryCreateRequest;
 import com.example.forumcore.dto.request.category.CategoryUpdateRequest;
 import com.example.forumcore.dto.response.CategoryResponse;
 import com.example.forumcore.service.category.CategoryService;
+import com.example.userapp.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.http.ResponseEntity;
@@ -15,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/categories")
+@RequestMapping("api/forum/categories")
 @RequiredArgsConstructor
 @Tag(name = "Категории")
 public class CategoryController {
@@ -24,8 +26,11 @@ public class CategoryController {
 
     @Operation(summary = "Создать новую категорию")
     @PostMapping
-    public ResponseEntity<UUID> createCategory(@RequestBody CategoryCreateRequest categoryCreateRequest) {
-        return ResponseEntity.ok(categoryService.createCategory(categoryCreateRequest));
+    public ResponseEntity<UUID> createCategory(
+            @RequestBody CategoryCreateRequest categoryCreateRequest,
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(categoryService.createCategory(categoryCreateRequest, user));
     }
 
     @Operation(summary = "Обновить категорию")

@@ -5,6 +5,7 @@ import com.example.forumcore.dto.request.category.CategoryUpdateRequest;
 import com.example.forumcore.dto.response.CategoryResponse;
 import com.example.forumcore.entity.Category;
 import com.example.forumcore.repository.CategoryRepository;
+import com.example.userapp.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public UUID createCategory(CategoryCreateRequest request) {
+    public UUID createCategory(CategoryCreateRequest request, User user) {
         Category category = new Category();
         category.setName(request.name());
         category.setCreatedBy("Zaglushka"); //TODO: изменить, когда добавлю авторизацию

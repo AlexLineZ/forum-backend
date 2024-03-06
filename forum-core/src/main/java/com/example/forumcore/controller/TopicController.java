@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/topics")
+@RequestMapping("api/forum/topics")
 @RequiredArgsConstructor
 @Tag(name = "Темы форума")
 public class TopicController {

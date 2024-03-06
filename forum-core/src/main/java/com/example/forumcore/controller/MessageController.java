@@ -15,7 +15,7 @@ import java.util.UUID;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/api/messages")
+@RequestMapping("api/forum/messages")
 @RequiredArgsConstructor
 @Tag(name = "Сообщения темы")
 public class MessageController {

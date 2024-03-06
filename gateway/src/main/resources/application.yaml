@@ -1,1 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: forum-core
+          uri: http://localhost:8081/
+          predicates:
+            - Path=api/forum/**
+
+        - id: user-app
+          uri: http://localhost:8082/
+          predicates:
+            - Path=api/users/**
+
+springdoc:
+  swagger-ui:
+    enabled: true
 

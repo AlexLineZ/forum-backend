@@ -1,5 +1,9 @@
 server:
-  port: 8081
+  port: 8082
+
+jwt:
+  secret: r1Wq3Y7Ql8ivrpC4A6vEgBg1kllCKCrFkwhbZUNZ6Y8=
+  lifetime: 30m
 
 spring:
   jpa:
@@ -8,9 +12,9 @@ spring:
       hibernate:
         format_sql: true
   datasource:
-    url: jdbc:postgresql://localhost:5430/forum
-    username: forum
-    password: forum
+    url: jdbc:postgresql://localhost:5431/user
+    username: user
+    password: user
   flyway:
     enabled: true
     locations:

@@ -16,6 +16,7 @@
 
     <properties>
         <java.version>17</java.version>
+        <secutiry.version>3.2.3</secutiry.version>
     </properties>
 
     <dependencies>
@@ -23,6 +24,12 @@
             <groupId>com.example</groupId>
             <artifactId>common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>${secutiry.version}</version>
         </dependency>
     </dependencies>
 
