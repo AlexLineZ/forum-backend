@@ -1,6 +1,6 @@
 package com.example.forumcore.service.topic;
 
-import com.example.forumcore.dto.CustomPage;
+import com.example.forumcore.dto.PageResponse;
 import com.example.forumcore.dto.request.topic.TopicRequest;
 import com.example.forumcore.dto.response.TopicResponse;
 
@@ -14,7 +14,7 @@ public interface TopicService {
 
     void deleteTopic(UUID id);
 
-    CustomPage<TopicResponse> getTopics(int page, int size);
+    PageResponse<TopicResponse> getTopics(int page, int size);
 
-    CustomPage<TopicResponse> searchTopicsByName(String name, int page, int size);
+    PageResponse<TopicResponse> searchTopicsByName(String name, int page, int size);
 }

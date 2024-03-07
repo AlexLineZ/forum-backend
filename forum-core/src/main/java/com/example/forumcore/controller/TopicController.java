@@ -1,14 +1,12 @@
 package com.example.forumcore.controller;
 
-import com.example.forumcore.dto.CustomPage;
+import com.example.forumcore.dto.PageResponse;
 import com.example.forumcore.dto.request.topic.TopicRequest;
 import com.example.forumcore.dto.response.TopicResponse;
-import com.example.forumcore.entity.Topic;
 import com.example.forumcore.service.topic.TopicService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,16 +40,16 @@ public class TopicController {
 
     @Operation(summary = "Получить страницу тем форума")
     @GetMapping
-    public ResponseEntity<CustomPage<TopicResponse>> getTopics(@RequestParam(defaultValue = "0") int page,
-                                                               @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<PageResponse<TopicResponse>> getTopics(@RequestParam(defaultValue = "0") int page,
+                                                                 @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(topicService.getTopics(page, size));
     }
 
     @Operation(summary = "Найти темы по названию")
     @GetMapping("/search")
-    public ResponseEntity<CustomPage<TopicResponse>> searchTopicsByName(@RequestParam String name,
-                                                               @RequestParam(defaultValue = "0") int page,
-                                                               @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<PageResponse<TopicResponse>> searchTopicsByName(@RequestParam String name,
+                                                                          @RequestParam(defaultValue = "0") int page,
+                                                                          @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(topicService.searchTopicsByName(name, page, size));
     }
 }

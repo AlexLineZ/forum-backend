@@ -1,6 +1,6 @@
 package com.example.forumcore.controller;
 
-import com.example.forumcore.dto.CustomPage;
+import com.example.forumcore.dto.PageResponse;
 import com.example.forumcore.dto.request.message.MessageCreateRequest;
 import com.example.forumcore.dto.request.message.MessageUpdateRequest;
 import com.example.forumcore.dto.response.MessageResponse;
@@ -43,17 +43,17 @@ public class MessageController {
 
     @GetMapping("/topic/{topicId}")
     @Operation(summary = "Дать сообщения темы")
-    public ResponseEntity<CustomPage<MessageResponse>> getMessagesByTopic(
+    public ResponseEntity<PageResponse<MessageResponse>> getMessagesByTopic(
             @PathVariable UUID topicId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        CustomPage<MessageResponse> messages = messageService.getMessagesByTopic(topicId, page, size);
+        PageResponse<MessageResponse> messages = messageService.getMessagesByTopic(topicId, page, size);
         return ResponseEntity.ok(messages);
     }
 
     @GetMapping("/search")
     @Operation(summary = "Найти сообщения по критериям")
-    public ResponseEntity<CustomPage<MessageResponse>> searchMessages(
+    public ResponseEntity<PageResponse<MessageResponse>> searchMessages(
             @RequestParam(required = false) String text,
             @RequestParam(required = false) LocalDateTime dateFrom,
             @RequestParam(required = false) LocalDateTime dateTo,
@@ -63,7 +63,7 @@ public class MessageController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        CustomPage<MessageResponse> messages = messageService
+        PageResponse<MessageResponse> messages = messageService
                 .searchMessages(text, dateFrom, dateTo, createdBy, topicId, categoryId, page, size);
         return ResponseEntity.ok(messages);
     }

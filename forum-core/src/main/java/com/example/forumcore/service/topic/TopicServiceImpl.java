@@ -1,8 +1,9 @@
 package com.example.forumcore.service.topic;
 
-import com.example.forumcore.dto.CustomPage;
+import com.example.forumcore.dto.PageResponse;
 import com.example.forumcore.dto.request.topic.TopicRequest;
 import com.example.forumcore.dto.response.TopicResponse;
+import com.example.forumcore.entity.Category;
 import com.example.forumcore.entity.Topic;
 import com.example.forumcore.exception.NotFoundException;
 import com.example.forumcore.repository.CategoryRepository;
@@ -24,15 +25,21 @@ public class TopicServiceImpl implements TopicService {
     private final TopicRepository topicRepository;
     private final CategoryRepository categoryRepository;
 
-
     @Override
     @Transactional
     public UUID createTopic(TopicRequest topicRequest) {
+        boolean hasChildCategories = categoryRepository.existsByParentCategoryId(topicRequest.categoryId());
+        if (hasChildCategories) {
+            throw new IllegalStateException("Cannot create topic in a category that has child categories");
+        }
+
+        Category category = categoryRepository.findById(topicRequest.categoryId())
+                .orElseThrow(() -> new NotFoundException("Category with ID " + topicRequest.categoryId() + " not found"));
+
         Topic topic = new Topic();
         topic.setName(topicRequest.name());
-        topic.setCreatedBy(UUID.randomUUID()); //TODO: поправить после того, как сделаю авторизацию
-        topic.setCategory(categoryRepository.findById(topicRequest.categoryId())
-                .orElseThrow(() -> new NotFoundException("Category with ID " + topicRequest.categoryId() + " not found")));
+        topic.setCreatedBy(UUID.randomUUID()); // TODO: Доделать, когда добавлю авторизацию
+        topic.setCategory(category);
 
         Topic savedTopic = topicRepository.save(topic);
         return savedTopic.getId();
@@ -62,19 +69,19 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public CustomPage<TopicResponse> getTopics(int page, int size) {
+    public PageResponse<TopicResponse> getTopics(int page, int size) {
         Page<Topic> topics = topicRepository.findAll(PageRequest.of(page, size));
         return getTopicResponseCustomPage(topics);
     }
 
     @Override
-    public CustomPage<TopicResponse> searchTopicsByName(String name, int page, int size) {
+    public PageResponse<TopicResponse> searchTopicsByName(String name, int page, int size) {
         Page<Topic> topics = topicRepository.findBySubstringInName(name, PageRequest.of(page, size));
         return getTopicResponseCustomPage(topics);
     }
 
     @NotNull
-    private CustomPage<TopicResponse> getTopicResponseCustomPage(Page<Topic> topics) {
+    private PageResponse<TopicResponse> getTopicResponseCustomPage(Page<Topic> topics) {
         List<TopicResponse> content = topics.getContent().stream()
                 .map(topic -> new TopicResponse(
                         topic.getId(),
@@ -84,6 +91,6 @@ public class TopicServiceImpl implements TopicService {
                         topic.getCreatedBy(),
                         topic.getCategory().getId()))
                 .toList();
-        return new CustomPage<>(content, topics.getNumber(), topics.getSize(), topics.getTotalElements());
+        return new PageResponse<>(content, topics.getNumber(), topics.getSize(), topics.getTotalElements());
     }
 }

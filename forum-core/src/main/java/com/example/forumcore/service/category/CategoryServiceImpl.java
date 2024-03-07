@@ -5,6 +5,7 @@ import com.example.forumcore.dto.request.category.CategoryUpdateRequest;
 import com.example.forumcore.dto.response.CategoryResponse;
 import com.example.forumcore.entity.Category;
 import com.example.forumcore.repository.CategoryRepository;
+import com.example.forumcore.repository.TopicRepository;
 import com.example.userapp.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,16 +20,24 @@ import java.util.*;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final TopicRepository topicRepository;
 
     @Override
     @Transactional
     public UUID createCategory(CategoryCreateRequest request, User user) {
         Category category = new Category();
         category.setName(request.name());
-        category.setCreatedBy(user.getId()); //TODO: изменить, когда добавлю авторизацию
-        request.parentCategoryId().ifPresent(id ->
-                category.setParentCategory(categoryRepository.findById(id).orElse(null))
-        );
+        category.setCreatedBy(user.getId());
+        request.parentCategoryId().ifPresent(id -> {
+            Category parentCategory = categoryRepository.findById(id).orElse(null);
+            if (parentCategory != null) {
+                boolean hasTopics = topicRepository.existsByCategoryId(parentCategory.getId());
+                if (hasTopics) {
+                    throw new IllegalStateException("Cannot assign a category with topics as a parent category");
+                }
+                category.setParentCategory(parentCategory);
+            }
+        });
         categoryRepository.save(category);
         return category.getId();
     }

@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface TopicRepository extends JpaRepository<Topic, UUID> {
     @Query("SELECT t FROM Topic t WHERE LOWER(t.name) LIKE LOWER(CONCAT('%', :substring, '%'))")
     Page<Topic> findBySubstringInName(String substring, Pageable pageable);
+
+    boolean existsByCategoryId(UUID categoryId);
 }

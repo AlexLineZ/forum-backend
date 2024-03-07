@@ -1,6 +1,6 @@
 package com.example.forumcore.service.message;
 
-import com.example.forumcore.dto.CustomPage;
+import com.example.forumcore.dto.PageResponse;
 import com.example.forumcore.dto.request.message.MessageCreateRequest;
 import com.example.forumcore.dto.request.message.MessageUpdateRequest;
 import com.example.forumcore.dto.response.MessageResponse;
@@ -61,7 +61,7 @@ public class MessageServiceImpl implements MessageService{
 
     @Override
     @Transactional
-    public CustomPage<MessageResponse> getMessagesByTopic(UUID topicId, int page, int size) {
+    public PageResponse<MessageResponse> getMessagesByTopic(UUID topicId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Message> messages = messageRepository.findByTopicId(topicId, pageable);
 
@@ -70,12 +70,12 @@ public class MessageServiceImpl implements MessageService{
                 .map(MessageMapper::mapMessageToResponse)
                 .toList();
 
-        return new CustomPage<>(messageResponses, page, size, messages.getTotalElements());
+        return new PageResponse<>(messageResponses, page, size, messages.getTotalElements());
     }
 
     @Override
     @Transactional
-    public CustomPage<MessageResponse> searchMessages(
+    public PageResponse<MessageResponse> searchMessages(
             String text,
             LocalDateTime dateFrom,
             LocalDateTime dateTo,
@@ -110,6 +110,6 @@ public class MessageServiceImpl implements MessageService{
                 .map(MessageMapper::mapMessageToResponse)
                 .toList();
 
-        return new CustomPage<>(messageResponses, page, size, messages.getTotalElements());
+        return new PageResponse<>(messageResponses, page, size, messages.getTotalElements());
     }
 }
