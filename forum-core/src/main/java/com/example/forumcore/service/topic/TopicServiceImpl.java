@@ -8,10 +8,9 @@ import com.example.forumcore.exception.NotFoundException;
 import com.example.forumcore.repository.CategoryRepository;
 import com.example.forumcore.repository.TopicRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +30,7 @@ public class TopicServiceImpl implements TopicService {
     public UUID createTopic(TopicRequest topicRequest) {
         Topic topic = new Topic();
         topic.setName(topicRequest.name());
-        topic.setCreatedBy("Zaglushka"); //TODO: поправить после того, как сделаю авторизацию
+        topic.setCreatedBy(UUID.randomUUID()); //TODO: поправить после того, как сделаю авторизацию
         topic.setCategory(categoryRepository.findById(topicRequest.categoryId())
                 .orElseThrow(() -> new NotFoundException("Category with ID " + topicRequest.categoryId() + " not found")));
 

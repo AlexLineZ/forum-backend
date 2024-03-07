@@ -36,7 +36,7 @@ public class MessageServiceImpl implements MessageService{
         message.setText(request.text());
         message.setTopic(topicRepository.findById(request.topicId())
                 .orElseThrow(() -> new NotFoundException("Topic with ID " + request.topicId() + " not found")));
-        message.setCreatedBy("Zaglushka"); //TODO: поправить при добавлении авторизации
+        message.setCreatedBy(UUID.randomUUID()); //TODO: поправить при добавлении авторизации
         Message savedMessage = messageRepository.save(message);
         return savedMessage.getId();
     }

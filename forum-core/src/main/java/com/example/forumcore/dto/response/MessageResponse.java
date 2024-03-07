@@ -9,6 +9,6 @@ public record MessageResponse(
         UUID topicId,
         Date createdAt,
         Date modifiedAt,
-        String createdBy
+        UUID createdBy
 ) {
 }

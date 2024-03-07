@@ -27,7 +27,7 @@ public class Category {
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifiedAt;
 
-    private String createdBy;
+    private UUID createdBy;
 
     private String name;
 

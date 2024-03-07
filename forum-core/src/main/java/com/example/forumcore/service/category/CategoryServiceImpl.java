@@ -25,7 +25,7 @@ public class CategoryServiceImpl implements CategoryService {
     public UUID createCategory(CategoryCreateRequest request, User user) {
         Category category = new Category();
         category.setName(request.name());
-        category.setCreatedBy("Zaglushka"); //TODO: изменить, когда добавлю авторизацию
+        category.setCreatedBy(user.getId()); //TODO: изменить, когда добавлю авторизацию
         request.parentCategoryId().ifPresent(id ->
                 category.setParentCategory(categoryRepository.findById(id).orElse(null))
         );

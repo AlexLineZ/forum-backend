@@ -26,7 +26,7 @@ public class Message {
     @Temporal(TemporalType.TIMESTAMP)
     private Date modifiedAt;
 
-    private String createdBy;
+    private UUID createdBy;
 
     @Lob
     private String text;

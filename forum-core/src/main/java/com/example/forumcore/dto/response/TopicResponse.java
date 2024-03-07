@@ -8,7 +8,7 @@ public record TopicResponse(
         String name,
         Date createdAt,
         Date modifiedAt,
-        String createdBy,
+        UUID createdBy,
         UUID categoryId
 ) {
 }
