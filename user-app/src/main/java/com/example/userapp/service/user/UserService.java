@@ -1,5 +1,7 @@
 package com.example.userapp.service.user;
 
+import com.example.common.exception.NotFoundException;
+import com.example.common.exception.UserNotFoundException;
 import com.example.userapp.dto.TokenResponse;
 import com.example.userapp.dto.request.LoginRequest;
 import com.example.userapp.dto.request.RegisterRequest;
@@ -34,7 +36,8 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    public UserResponse getUserResponseByAuthentication(User user) {
+    public UserResponse getUserResponseByAuthentication(Authentication authentication) {
+        User user = getUserByAuthentication(authentication);
         return UserMapper.mapUserToResponse(user);
     }
 
@@ -44,7 +47,7 @@ public class UserService implements UserDetailsService {
                 .orElse(null);
 
         if (user == null){
-            throw new UsernameNotFoundException("Invalid login details");
+            throw new UserNotFoundException("Invalid login details");
         }
 
         return TokenResponse.builder()

@@ -10,4 +10,5 @@ import java.util.UUID;
 
 public interface MessageRepository extends JpaRepository<Message, UUID>, JpaSpecificationExecutor<Message> {
     Page<Message> findByTopicId(UUID topicId, Pageable pageable);
+    void deleteByTopicId(UUID topicId);
 }

@@ -1,4 +1,4 @@
-package com.example.forumcore.exception;
+package com.example.common.exception;
 
 public class NotFoundException extends RuntimeException{
     public NotFoundException() {

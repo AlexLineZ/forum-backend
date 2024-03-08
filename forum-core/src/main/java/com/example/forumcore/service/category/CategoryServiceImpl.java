@@ -1,10 +1,14 @@
 package com.example.forumcore.service.category;
 
+import com.example.common.exception.AccessNotAllowedException;
+import com.example.common.exception.NotFoundException;
 import com.example.forumcore.dto.request.category.CategoryCreateRequest;
 import com.example.forumcore.dto.request.category.CategoryUpdateRequest;
 import com.example.forumcore.dto.response.CategoryResponse;
 import com.example.forumcore.entity.Category;
+import com.example.forumcore.entity.Topic;
 import com.example.forumcore.repository.CategoryRepository;
+import com.example.forumcore.repository.MessageRepository;
 import com.example.forumcore.repository.TopicRepository;
 import com.example.userapp.entity.User;
 import jakarta.transaction.Transactional;
@@ -21,6 +25,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final TopicRepository topicRepository;
+    private final MessageRepository messageRepository;
 
     @Override
     @Transactional
@@ -44,9 +49,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public UUID updateCategory(UUID id, CategoryUpdateRequest request) {
+    public UUID updateCategory(UUID id, CategoryUpdateRequest request, User user) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new NotFoundException("Category not found"));
+        if (!category.getCreatedBy().equals(user.getId())) {
+            throw new AccessNotAllowedException("User is not the author of the category");
+        }
         category.setName(request.name());
         categoryRepository.save(category);
         return category.getId();
@@ -54,16 +62,15 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public void deleteCategory(UUID id) {
-        if (!categoryRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found");
+    public void deleteCategory(UUID id, User user) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Category not found"));
+
+        if (!category.getCreatedBy().equals(user.getId())) {
+            throw new AccessNotAllowedException("User is not the author of the category");
         }
-        List<Category> children = categoryRepository.findByParentCategoryId(id);
-        for (Category child : children) {
-            child.setParentCategory(null);
-            categoryRepository.save(child);
-        }
-        categoryRepository.deleteById(id);
+
+        deleteCategoryAndChildren(id);
     }
 
     @Override
@@ -110,5 +117,20 @@ public class CategoryServiceImpl implements CategoryService {
         }
         hierarchy.sort(Comparator.comparing(CategoryResponse::name));
         return hierarchy;
+    }
+
+    private void deleteCategoryAndChildren(UUID categoryId) {
+        List<Category> children = categoryRepository.findByParentCategoryId(categoryId);
+        for (Category child : children) {
+            deleteCategoryAndChildren(child.getId());
+        }
+
+        List<Topic> topics = topicRepository.findByCategoryId(categoryId);
+        for (Topic topic : topics) {
+            messageRepository.deleteByTopicId(topic.getId());
+            topicRepository.deleteById(topic.getId());
+        }
+
+        categoryRepository.deleteById(categoryId);
     }
 }

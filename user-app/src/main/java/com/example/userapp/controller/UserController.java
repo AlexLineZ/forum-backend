@@ -8,6 +8,7 @@ import com.example.userapp.entity.User;
 import com.example.userapp.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +29,7 @@ public class UserController {
     }
 
     @GetMapping("profile")
-    public ResponseEntity<UserResponse> getUser(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(userService.getUserResponseByAuthentication(user));
+    public ResponseEntity<UserResponse> getUser(Authentication authentication) {
+        return ResponseEntity.ok(userService.getUserResponseByAuthentication(authentication));
     }
 }
