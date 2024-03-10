@@ -6,6 +6,8 @@ jwt:
   lifetime: 30m
 
 spring:
+  application:
+    name: forum-core
   jpa:
     show-sql: true
     properties:

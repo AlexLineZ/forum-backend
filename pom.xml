@@ -8,6 +8,8 @@
         <module>forum-core</module>
         <module>user-app</module>
         <module>service-registry</module>
+        <module>gateway</module>
+        <module>security</module>
     </modules>
 
     <parent>

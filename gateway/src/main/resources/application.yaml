@@ -8,12 +8,12 @@ spring:
     gateway:
       routes:
         - id: forum-core
-          uri: http://localhost:8081/
+          uri: lb://FORUM-CORE
           predicates:
             - Path=api/forum/**
 
         - id: user-app
-          uri: http://localhost:8084/
+          uri: lb://USER-APP
           predicates:
             - Path=api/users/**
   main:
@@ -23,10 +23,6 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
-
-springdoc:
-  swagger-ui:
-    enabled: true
 
 logging:
   level:

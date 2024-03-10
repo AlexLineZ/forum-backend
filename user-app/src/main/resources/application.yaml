@@ -6,6 +6,8 @@ jwt:
   lifetime: 30m
 
 spring:
+  application:
+    name: user-app
   jpa:
     show-sql: true
     properties:
@@ -19,6 +21,10 @@ spring:
     enabled: true
     locations:
       - migrations
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
 
 springdoc:
   swagger-ui:
