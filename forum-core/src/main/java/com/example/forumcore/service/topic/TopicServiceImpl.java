@@ -32,16 +32,19 @@ public class TopicServiceImpl implements TopicService {
     @Override
     @Transactional
     public UUID createTopic(TopicRequest topicRequest, User user) {
-        Category category = categoryRepository.findById(topicRequest.categoryId())
-                .orElseThrow(() -> new NotFoundException("Category with ID " + topicRequest.categoryId() + " not found"));
+        if (topicRequest.getCategoryId() == null) {
+            throw new IllegalStateException("Category Id must not be null");
+        }
+        Category category = categoryRepository.findById(topicRequest.getCategoryId())
+                .orElseThrow(() -> new NotFoundException("Category with ID " + topicRequest.getCategoryId() + " not found"));
 
-        boolean hasChildCategories = categoryRepository.existsByParentCategoryId(topicRequest.categoryId());
+        boolean hasChildCategories = categoryRepository.existsByParentCategoryId(topicRequest.getCategoryId());
         if (hasChildCategories) {
             throw new IllegalStateException("Cannot create topic in a category that has child categories");
         }
 
         Topic topic = new Topic();
-        topic.setName(topicRequest.name());
+        topic.setName(topicRequest.getName());
         topic.setCreatedBy(user.getId());
         topic.setCategory(category);
 
@@ -59,9 +62,9 @@ public class TopicServiceImpl implements TopicService {
             throw new AccessNotAllowedException("You do not have permission to update this topic");
         }
 
-        topic.setName(updatedTopic.name());
-        topic.setCategory(categoryRepository.findById(updatedTopic.categoryId())
-                .orElseThrow(() -> new NotFoundException("Category with ID " + updatedTopic.categoryId() + " not found")));
+        topic.setName(updatedTopic.getName());
+        topic.setCategory(categoryRepository.findById(updatedTopic.getCategoryId())
+                .orElseThrow(() -> new NotFoundException("Category with ID " + updatedTopic.getCategoryId() + " not found")));
 
         topicRepository.save(topic);
         return id;

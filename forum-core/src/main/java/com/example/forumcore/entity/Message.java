@@ -1,6 +1,7 @@
 package com.example.forumcore.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
@@ -29,6 +30,7 @@ public class Message {
     private UUID createdBy;
 
     @Lob
+    @NotBlank(message = "Text cannot be blank")
     private String text;
 
     @ManyToOne

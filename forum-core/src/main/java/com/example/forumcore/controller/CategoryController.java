@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,7 +40,7 @@ public class CategoryController {
     })
     @PostMapping
     public ResponseEntity<UUID> createCategory(
-            @RequestBody CategoryCreateRequest categoryCreateRequest,
+           @Valid @RequestBody CategoryCreateRequest categoryCreateRequest,
             @AuthenticationPrincipal User user
     ) {
         return ResponseEntity.ok(categoryService.createCategory(categoryCreateRequest, user));
@@ -61,7 +62,7 @@ public class CategoryController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<UUID> updateCategory(@PathVariable UUID id,
-                                               @RequestBody CategoryUpdateRequest categoryRequest,
+                                               @Valid @RequestBody CategoryUpdateRequest categoryRequest,
                                                @AuthenticationPrincipal User user
     ) {
         return ResponseEntity.ok(categoryService.updateCategory(id, categoryRequest, user));

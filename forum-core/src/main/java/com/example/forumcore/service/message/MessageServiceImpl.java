@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,10 +35,13 @@ public class MessageServiceImpl implements MessageService{
     @Override
     @Transactional
     public UUID createMessage(MessageCreateRequest request, User user) {
+        if (request.getTopicId() == null) {
+            throw new IllegalStateException("Topic ID must not be null");
+        }
         Message message = new Message();
-        message.setText(request.text());
-        message.setTopic(topicRepository.findById(request.topicId())
-                .orElseThrow(() -> new NotFoundException("Topic with ID " + request.topicId() + " not found")));
+        message.setText(request.getText());
+        message.setTopic(topicRepository.findById(request.getTopicId())
+                .orElseThrow(() -> new NotFoundException("Topic with ID " + request.getTopicId() + " not found")));
         message.setCreatedBy(user.getId());
         Message savedMessage = messageRepository.save(message);
         return savedMessage.getId();
@@ -53,7 +57,7 @@ public class MessageServiceImpl implements MessageService{
             throw new AccessNotAllowedException("You do not have permission to update this message");
         }
 
-        message.setText(request.text());
+        message.setText(request.getText());
         messageRepository.save(message);
         return id;
     }

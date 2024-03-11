@@ -1,6 +1,19 @@
 package com.example.forumcore.dto.request.message;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
+
 import java.util.UUID;
 
-public record MessageCreateRequest(String text, UUID topicId) {
+@Data
+public class MessageCreateRequest {
+
+    @NotBlank(message = "Text must not be null")
+    @Size(min = 1, message = "Text must have at least 1 character")
+    private String text;
+
+    @NotNull(message = "Topic ID is required")
+    private UUID topicId;
 }

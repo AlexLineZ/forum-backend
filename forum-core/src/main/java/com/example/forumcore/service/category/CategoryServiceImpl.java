@@ -31,21 +31,23 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public UUID createCategory(CategoryCreateRequest request, User user) {
         Category category = new Category();
-        category.setName(request.name());
+        category.setName(request.getName());
         category.setCreatedBy(user.getId());
-        request.parentCategoryId().ifPresent(id -> {
-            Category parentCategory = categoryRepository.findById(id).orElse(null);
-            if (parentCategory != null) {
-                boolean hasTopics = topicRepository.existsByCategoryId(parentCategory.getId());
-                if (hasTopics) {
-                    throw new IllegalStateException("Cannot assign a category with topics as a parent category");
-                }
-                category.setParentCategory(parentCategory);
+        UUID parentCategoryId = request.getParentCategoryId();
+        if (parentCategoryId != null) {
+            Category parentCategory = categoryRepository.findById(parentCategoryId)
+                    .orElseThrow(() -> new NotFoundException("Parent category with ID " + parentCategoryId + " not found"));
+
+            boolean hasTopics = topicRepository.existsByCategoryId(parentCategoryId);
+            if (hasTopics) {
+                throw new IllegalStateException("Cannot assign a category with topics as a parent category");
             }
-        });
+            category.setParentCategory(parentCategory);
+        }
         categoryRepository.save(category);
         return category.getId();
     }
+
 
     @Override
     @Transactional
@@ -55,7 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (!category.getCreatedBy().equals(user.getId())) {
             throw new AccessNotAllowedException("User is not the author of the category");
         }
-        category.setName(request.name());
+        category.setName(request.getName());
         categoryRepository.save(category);
         return category.getId();
     }

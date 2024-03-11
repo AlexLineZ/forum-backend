@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,7 +39,7 @@ public class MessageController {
                     content = @Content(mediaType = "application/json"))
     })
     public ResponseEntity<UUID> createMessage(
-            @RequestBody MessageCreateRequest request,
+            @Valid @RequestBody MessageCreateRequest request,
             @AuthenticationPrincipal User user
     ) {
         return ResponseEntity.ok(messageService.createMessage(request, user));
@@ -61,7 +62,7 @@ public class MessageController {
     @Operation(summary = "Редактировать сообщение")
     public ResponseEntity<UUID> updateMessage(
             @PathVariable UUID id,
-            @RequestBody MessageUpdateRequest request,
+            @Valid @RequestBody MessageUpdateRequest request,
             @AuthenticationPrincipal User user
     ) {
         UUID messageId = messageService.updateMessage(id, request, user);
@@ -85,7 +86,7 @@ public class MessageController {
     @Operation(summary = "Удалить сообщение")
     public ResponseEntity<Void> deleteMessage(@PathVariable UUID id, @AuthenticationPrincipal User user) {
         messageService.deleteMessage(id, user);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/topic/{topicId}")

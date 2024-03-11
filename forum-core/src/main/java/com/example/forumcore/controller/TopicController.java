@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,7 +36,10 @@ public class TopicController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping
-    public ResponseEntity<UUID> createTopic(@RequestBody TopicRequest topic, @AuthenticationPrincipal User user) {
+    public ResponseEntity<UUID> createTopic(
+            @Valid @RequestBody TopicRequest topic,
+            @AuthenticationPrincipal User user
+    ) {
         return ResponseEntity.ok(topicService.createTopic(topic, user));
     }
 
@@ -56,7 +60,7 @@ public class TopicController {
     @PutMapping("/{id}")
     public ResponseEntity<UUID> updateTopic(
             @PathVariable UUID id,
-            @RequestBody TopicRequest topic,
+            @Valid @RequestBody TopicRequest topic,
             @AuthenticationPrincipal User user
     ) {
         return ResponseEntity.ok(topicService.updateTopic(id, topic, user));
