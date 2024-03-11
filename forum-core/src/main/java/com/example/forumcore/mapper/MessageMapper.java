@@ -11,7 +11,8 @@ public class MessageMapper {
                 message.getTopic().getId(),
                 message.getCreatedAt(),
                 message.getModifiedAt(),
-                message.getCreatedBy()
+                message.getCreatedBy(),
+                message.getAuthor()
         );
     }
 }

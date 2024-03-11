@@ -1,0 +1,2 @@
+ALTER TABLE messages
+ADD COLUMN author VARCHAR(255);

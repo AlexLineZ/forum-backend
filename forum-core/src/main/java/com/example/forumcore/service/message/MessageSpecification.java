@@ -32,7 +32,7 @@ public class MessageSpecification {
             if (author == null) {
                 return cb.isTrue(cb.literal(true));
             }
-            return cb.equal(cb.lower(root.get("author")), author.toLowerCase());
+            return cb.like(cb.lower(root.get("author")), "%" + author.toLowerCase() + "%");
         };
     }
 

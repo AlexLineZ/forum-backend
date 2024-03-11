@@ -40,6 +40,7 @@ public class MessageServiceImpl implements MessageService{
         }
         Message message = new Message();
         message.setText(request.getText());
+        message.setAuthor(user.getFirstName() + " " + user.getLastName());
         message.setTopic(topicRepository.findById(request.getTopicId())
                 .orElseThrow(() -> new NotFoundException("Topic with ID " + request.getTopicId() + " not found")));
         message.setCreatedBy(user.getId());

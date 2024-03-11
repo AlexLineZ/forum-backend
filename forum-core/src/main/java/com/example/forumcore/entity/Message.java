@@ -29,7 +29,8 @@ public class Message {
 
     private UUID createdBy;
 
-    @Lob
+    private String author;
+
     @NotBlank(message = "Text cannot be blank")
     private String text;
 

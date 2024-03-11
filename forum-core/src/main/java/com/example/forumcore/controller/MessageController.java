@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -118,8 +120,8 @@ public class MessageController {
             @RequestParam(required = false) String createdBy,
             @RequestParam(required = false) UUID topicId,
             @RequestParam(required = false) UUID categoryId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = "Negative page") int page,
+            @RequestParam(defaultValue = "10") @Positive(message = "Negative size") int size
     ) {
         PageResponse<MessageResponse> messages = messageService
                 .searchMessages(text, dateFrom, dateTo, createdBy, topicId, categoryId, page, size);
