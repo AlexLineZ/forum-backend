@@ -3,9 +3,12 @@ server:
 
 spring:
   application:
-    name: gateway-service
+    name: GATEWAY-SERVICE
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
       routes:
         - id: forum-core
           uri: lb://FORUM-CORE
