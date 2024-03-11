@@ -13,12 +13,12 @@ spring:
         - id: forum-core
           uri: lb://FORUM-CORE
           predicates:
-            - Path=api/forum/**
+            - Path=/api/forum/**
 
         - id: user-app
           uri: lb://USER-APP
           predicates:
-            - Path=api/users/**
+            - Path=/api/users/**
   main:
     web-application-type: reactive
 
