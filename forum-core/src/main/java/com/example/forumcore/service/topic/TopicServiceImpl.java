@@ -7,6 +7,8 @@ import com.example.forumcore.dto.request.topic.TopicRequest;
 import com.example.forumcore.dto.response.TopicResponse;
 import com.example.forumcore.entity.Category;
 import com.example.forumcore.entity.Topic;
+import com.example.forumcore.enums.MessageSortType;
+import com.example.forumcore.enums.TopicSortType;
 import com.example.forumcore.repository.CategoryRepository;
 import com.example.forumcore.repository.MessageRepository;
 import com.example.forumcore.repository.TopicRepository;
@@ -16,6 +18,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -85,8 +88,15 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public PageResponse<TopicResponse> getTopics(int page, int size) {
-        Page<Topic> topics = topicRepository.findAll(PageRequest.of(page, size));
+    public PageResponse<TopicResponse> getTopics(int page, int size, TopicSortType sortType) {
+        if (page < 0) {
+            page = 0;
+        }
+        if (size < 1) {
+            size = 1;
+        }
+        Pageable pageable = PageRequest.of(page, size, sortType.toSort());
+        Page<Topic> topics = topicRepository.findAll(pageable);
         return getTopicResponseCustomPage(topics);
     }
 

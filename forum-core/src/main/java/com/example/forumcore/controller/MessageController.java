@@ -4,6 +4,7 @@ import com.example.forumcore.dto.PageResponse;
 import com.example.forumcore.dto.request.message.MessageCreateRequest;
 import com.example.forumcore.dto.request.message.MessageUpdateRequest;
 import com.example.forumcore.dto.response.MessageResponse;
+import com.example.forumcore.enums.MessageSortType;
 import com.example.forumcore.service.message.MessageService;
 import com.example.userapp.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -101,8 +102,9 @@ public class MessageController {
     public ResponseEntity<PageResponse<MessageResponse>> getMessagesByTopic(
             @PathVariable UUID topicId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        PageResponse<MessageResponse> messages = messageService.getMessagesByTopic(topicId, page, size);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "CREATED_AT_DESC") MessageSortType sortType) {
+        PageResponse<MessageResponse> messages = messageService.getMessagesByTopic(topicId, page, size, sortType);
         return ResponseEntity.ok(messages);
     }
 

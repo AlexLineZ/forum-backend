@@ -3,6 +3,7 @@ package com.example.forumcore.controller;
 import com.example.forumcore.dto.PageResponse;
 import com.example.forumcore.dto.request.topic.TopicRequest;
 import com.example.forumcore.dto.response.TopicResponse;
+import com.example.forumcore.enums.TopicSortType;
 import com.example.forumcore.service.topic.TopicService;
 import com.example.userapp.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -93,9 +94,12 @@ public class TopicController {
                     content = @Content(mediaType = "application/json"))
     })
     @GetMapping
-    public ResponseEntity<PageResponse<TopicResponse>> getTopics(@RequestParam(defaultValue = "0") int page,
-                                                                 @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(topicService.getTopics(page, size));
+    public ResponseEntity<PageResponse<TopicResponse>> getTopics(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "CREATED_AT_DESC") TopicSortType sortType) {
+        PageResponse<TopicResponse> topics = topicService.getTopics(page, size, sortType);
+        return ResponseEntity.ok(topics);
     }
 
     @Operation(summary = "Найти темы по названию")

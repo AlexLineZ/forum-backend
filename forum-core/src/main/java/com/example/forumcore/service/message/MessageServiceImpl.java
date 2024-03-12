@@ -7,6 +7,7 @@ import com.example.forumcore.dto.request.message.MessageCreateRequest;
 import com.example.forumcore.dto.request.message.MessageUpdateRequest;
 import com.example.forumcore.dto.response.MessageResponse;
 import com.example.forumcore.entity.Message;
+import com.example.forumcore.enums.MessageSortType;
 import com.example.forumcore.mapper.MessageMapper;
 import com.example.forumcore.repository.MessageRepository;
 import com.example.forumcore.repository.TopicRepository;
@@ -78,8 +79,15 @@ public class MessageServiceImpl implements MessageService{
 
     @Override
     @Transactional
-    public PageResponse<MessageResponse> getMessagesByTopic(UUID topicId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+    public PageResponse<MessageResponse> getMessagesByTopic(UUID topicId, int page, int size, MessageSortType sortType) {
+        if (page < 0) {
+            page = 0;
+        }
+
+        if (size < 1) {
+            size = 1;
+        }
+        Pageable pageable = PageRequest.of(page, size, sortType.toSort());
         Page<Message> messages = messageRepository.findByTopicId(topicId, pageable);
 
         List<MessageResponse> messageResponses = messages.getContent()
