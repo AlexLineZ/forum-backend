@@ -1,5 +1,6 @@
 package com.example.userapp.controller;
 
+import com.example.common.dto.UserDto;
 import com.example.userapp.dto.TokenResponse;
 import com.example.userapp.dto.request.LoginRequest;
 import com.example.userapp.dto.request.RegisterRequest;
@@ -10,7 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/users")
@@ -29,7 +33,12 @@ public class UserController {
     }
 
     @GetMapping("profile")
-    public ResponseEntity<UserResponse> getUser(Authentication authentication) {
-        return ResponseEntity.ok(userService.getUserResponseByAuthentication(authentication));
+    public ResponseEntity<UserResponse> getUser(@AuthenticationPrincipal UserDto userDto) {
+        return ResponseEntity.ok(userService.getUserResponseByAuthentication(userDto));
+    }
+
+    @GetMapping("person")
+    public ResponseEntity<UserDto> getUserById(@RequestParam("userId") UUID userId) {
+        return ResponseEntity.ok(userService.getUserByUserId(userId));
     }
 }

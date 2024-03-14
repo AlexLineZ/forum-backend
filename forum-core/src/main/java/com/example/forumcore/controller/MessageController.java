@@ -1,12 +1,12 @@
 package com.example.forumcore.controller;
 
+import com.example.common.dto.UserDto;
 import com.example.forumcore.dto.PageResponse;
 import com.example.forumcore.dto.request.message.MessageCreateRequest;
 import com.example.forumcore.dto.request.message.MessageUpdateRequest;
 import com.example.forumcore.dto.response.MessageResponse;
 import com.example.forumcore.enums.MessageSortType;
 import com.example.forumcore.service.message.MessageService;
-import com.example.userapp.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -43,7 +43,7 @@ public class MessageController {
     })
     public ResponseEntity<UUID> createMessage(
             @Valid @RequestBody MessageCreateRequest request,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserDto user
     ) {
         return ResponseEntity.ok(messageService.createMessage(request, user));
     }
@@ -66,7 +66,7 @@ public class MessageController {
     public ResponseEntity<UUID> updateMessage(
             @PathVariable UUID id,
             @Valid @RequestBody MessageUpdateRequest request,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserDto user
     ) {
         UUID messageId = messageService.updateMessage(id, request, user);
         return ResponseEntity.ok(messageId);
@@ -87,7 +87,7 @@ public class MessageController {
                     content = @Content(mediaType = "application/json"))
     })
     @Operation(summary = "Удалить сообщение")
-    public ResponseEntity<Void> deleteMessage(@PathVariable UUID id, @AuthenticationPrincipal User user) {
+    public ResponseEntity<Void> deleteMessage(@PathVariable UUID id, @AuthenticationPrincipal UserDto user) {
         messageService.deleteMessage(id, user);
         return ResponseEntity.ok().build();
     }

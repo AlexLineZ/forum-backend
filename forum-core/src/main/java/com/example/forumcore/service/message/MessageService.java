@@ -1,22 +1,22 @@
 package com.example.forumcore.service.message;
 
+import com.example.common.dto.UserDto;
 import com.example.forumcore.dto.PageResponse;
 import com.example.forumcore.dto.request.message.MessageCreateRequest;
 import com.example.forumcore.dto.request.message.MessageUpdateRequest;
 import com.example.forumcore.dto.response.MessageResponse;
 import com.example.forumcore.enums.MessageSortType;
-import com.example.userapp.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 public interface MessageService {
 
-    UUID createMessage(MessageCreateRequest request, User user);
+    UUID createMessage(MessageCreateRequest request, UserDto user);
 
-    UUID updateMessage(UUID id, MessageUpdateRequest request, User user);
+    UUID updateMessage(UUID id, MessageUpdateRequest request, UserDto user);
 
-    void deleteMessage(UUID id, User user);
+    void deleteMessage(UUID id, UserDto user);
 
     PageResponse<MessageResponse> getMessagesByTopic(UUID topicId, int page, int size, MessageSortType sortType);
 

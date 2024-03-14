@@ -1,10 +1,10 @@
 package com.example.forumcore.controller;
 
+import com.example.common.dto.UserDto;
 import com.example.forumcore.dto.request.category.CategoryCreateRequest;
 import com.example.forumcore.dto.request.category.CategoryUpdateRequest;
 import com.example.forumcore.dto.response.CategoryResponse;
 import com.example.forumcore.service.category.CategoryService;
-import com.example.userapp.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -41,7 +41,7 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<UUID> createCategory(
            @Valid @RequestBody CategoryCreateRequest categoryCreateRequest,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserDto user
     ) {
         return ResponseEntity.ok(categoryService.createCategory(categoryCreateRequest, user));
     }
@@ -63,7 +63,7 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseEntity<UUID> updateCategory(@PathVariable UUID id,
                                                @Valid @RequestBody CategoryUpdateRequest categoryRequest,
-                                               @AuthenticationPrincipal User user
+                                               @AuthenticationPrincipal UserDto user
     ) {
         return ResponseEntity.ok(categoryService.updateCategory(id, categoryRequest, user));
     }
@@ -83,7 +83,7 @@ public class CategoryController {
                     content = @Content(mediaType = "application/json"))
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable UUID id, @AuthenticationPrincipal User user) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable UUID id, @AuthenticationPrincipal UserDto user) {
         categoryService.deleteCategory(id, user);
         return ResponseEntity.ok().build();
     }

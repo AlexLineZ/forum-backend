@@ -1,13 +1,13 @@
 package com.example.userapp.service.user;
 
-import com.example.common.exception.NotFoundException;
+import com.example.common.dto.UserDto;
 import com.example.common.exception.UserNotFoundException;
+import com.example.security.jwt.JwtTokenUtils;
 import com.example.userapp.dto.TokenResponse;
 import com.example.userapp.dto.request.LoginRequest;
 import com.example.userapp.dto.request.RegisterRequest;
 import com.example.userapp.dto.response.UserResponse;
 import com.example.userapp.entity.User;
-import com.example.userapp.jwt.JwtTokenUtils;
 import com.example.userapp.mapper.UserMapper;
 import com.example.userapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,12 +32,12 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
 
         return TokenResponse.builder()
-                .accessToken(jwtTokenUtils.generateToken(user))
+                .accessToken(jwtTokenUtils.generateToken(UserMapper.userToUserDto(user)))
                 .build();
     }
 
-    public UserResponse getUserResponseByAuthentication(Authentication authentication) {
-        User user = getUserByAuthentication(authentication);
+    public UserResponse getUserResponseByAuthentication(UserDto userDto) {
+        User user = getUserByAuthentication(userDto);
         return UserMapper.mapUserToResponse(user);
     }
 
@@ -51,16 +51,29 @@ public class UserService implements UserDetailsService {
         }
 
         return TokenResponse.builder()
-                .accessToken(jwtTokenUtils.generateToken(user))
+                .accessToken(jwtTokenUtils.generateToken(UserMapper.userToUserDto(user)))
                 .build();
     }
 
 
-    public User getUserByAuthentication(Authentication authentication) {
-        UUID id = jwtTokenUtils.getUserIdFromAuthentication(authentication);
+    public User getUserByAuthentication(UserDto userDto) {
+        return userRepository.findById(userDto.id())
+                .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + userDto.id() + " not found"));
+    }
 
-        return userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + id + " not found"));
+    public UserDto getUserByUserId(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + userId + " not found"));
+
+        return new UserDto(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getRegistrationDate(),
+                user.getLastUpdateDate()
+        );
     }
 
     @Override

@@ -1,6 +1,6 @@
-package com.example.userapp.jwt;
+package com.example.security.jwt;
 
-import com.example.userapp.entity.User;
+import com.example.common.dto.UserDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -29,7 +29,7 @@ public class JwtTokenUtils {
     @Value("${jwt.lifetime}")
     private Duration jwtLifetime;
 
-    public String generateToken(User user){
+    public String generateToken(UserDto user){
         Map<String, Object> claims = new HashMap<>();
 
         Date issuedDate = new Date();
@@ -38,8 +38,8 @@ public class JwtTokenUtils {
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(user.getEmail())
-                .claim("userId", user.getId().toString())
+                .setSubject(user.email())
+                .claim("userId", user.id().toString())
                 .setId(tokenId.toString())
                 .setIssuedAt(issuedDate)
                 .setExpiration(expiredDate)
@@ -66,15 +66,6 @@ public class JwtTokenUtils {
         return getAllClaimsFromToken(token).getId();
     }
 
-    public UUID getUserIdFromAuthentication(Authentication authentication) {
-        if (authentication.getPrincipal() instanceof UserDetails userDetails) {
-            if (userDetails instanceof User) {
-                return ((User) userDetails).getId();
-            }
-        }
-        throw new IllegalStateException("Cannot extract user ID from Authentication object");
-    }
-
     private SecretKey getSignKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
@@ -88,3 +79,4 @@ public class JwtTokenUtils {
                 .getBody();
     }
 }
+

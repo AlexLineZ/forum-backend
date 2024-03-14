@@ -1,5 +1,6 @@
 package com.example.userapp.mapper;
 
+import com.example.common.dto.UserDto;
 import com.example.userapp.dto.request.RegisterRequest;
 import com.example.userapp.dto.response.UserResponse;
 import com.example.userapp.entity.User;
@@ -29,4 +30,16 @@ public class UserMapper {
                 user.getLastUpdateDate()
         );
     }
+    public static UserDto userToUserDto(User user) {
+        return new UserDto(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getRegistrationDate(),
+                user.getLastUpdateDate()
+        );
+    }
+
 }

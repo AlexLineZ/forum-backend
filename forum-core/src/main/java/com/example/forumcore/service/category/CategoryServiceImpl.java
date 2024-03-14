@@ -1,5 +1,6 @@
 package com.example.forumcore.service.category;
 
+import com.example.common.dto.UserDto;
 import com.example.common.exception.AccessNotAllowedException;
 import com.example.common.exception.NotFoundException;
 import com.example.forumcore.dto.request.category.CategoryCreateRequest;
@@ -10,12 +11,9 @@ import com.example.forumcore.entity.Topic;
 import com.example.forumcore.repository.CategoryRepository;
 import com.example.forumcore.repository.MessageRepository;
 import com.example.forumcore.repository.TopicRepository;
-import com.example.userapp.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -29,10 +27,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public UUID createCategory(CategoryCreateRequest request, User user) {
+    public UUID createCategory(CategoryCreateRequest request, UserDto user) {
         Category category = new Category();
         category.setName(request.getName());
-        category.setCreatedBy(user.getId());
+        category.setCreatedBy(user.id());
         UUID parentCategoryId = request.getParentCategoryId();
         if (parentCategoryId != null) {
             Category parentCategory = categoryRepository.findById(parentCategoryId)
@@ -51,10 +49,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public UUID updateCategory(UUID id, CategoryUpdateRequest request, User user) {
+    public UUID updateCategory(UUID id, CategoryUpdateRequest request, UserDto user) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
-        if (!category.getCreatedBy().equals(user.getId())) {
+        if (!category.getCreatedBy().equals(user.id())) {
             throw new AccessNotAllowedException("User is not the author of the category");
         }
         category.setName(request.getName());
@@ -64,11 +62,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public void deleteCategory(UUID id, User user) {
+    public void deleteCategory(UUID id, UserDto user) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
 
-        if (!category.getCreatedBy().equals(user.getId())) {
+        if (!category.getCreatedBy().equals(user.id())) {
             throw new AccessNotAllowedException("User is not the author of the category");
         }
 

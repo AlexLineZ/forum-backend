@@ -1,11 +1,11 @@
 package com.example.forumcore.controller;
 
+import com.example.common.dto.UserDto;
 import com.example.forumcore.dto.PageResponse;
 import com.example.forumcore.dto.request.topic.TopicRequest;
 import com.example.forumcore.dto.response.TopicResponse;
 import com.example.forumcore.enums.TopicSortType;
 import com.example.forumcore.service.topic.TopicService;
-import com.example.userapp.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,7 +39,7 @@ public class TopicController {
     @PostMapping
     public ResponseEntity<UUID> createTopic(
             @Valid @RequestBody TopicRequest topic,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserDto user
     ) {
         return ResponseEntity.ok(topicService.createTopic(topic, user));
     }
@@ -62,7 +62,7 @@ public class TopicController {
     public ResponseEntity<UUID> updateTopic(
             @PathVariable UUID id,
             @Valid @RequestBody TopicRequest topic,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserDto user
     ) {
         return ResponseEntity.ok(topicService.updateTopic(id, topic, user));
     }
@@ -82,7 +82,7 @@ public class TopicController {
                     content = @Content(mediaType = "application/json"))
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTopic(@PathVariable UUID id, @AuthenticationPrincipal User user) {
+    public ResponseEntity<Void> deleteTopic(@PathVariable UUID id, @AuthenticationPrincipal UserDto user) {
         topicService.deleteTopic(id, user);
         return ResponseEntity.ok().build();
     }

@@ -1,5 +1,6 @@
 package com.example.forumcore.service.message;
 
+import com.example.common.dto.UserDto;
 import com.example.common.exception.AccessNotAllowedException;
 import com.example.common.exception.NotFoundException;
 import com.example.forumcore.dto.PageResponse;
@@ -11,7 +12,6 @@ import com.example.forumcore.enums.MessageSortType;
 import com.example.forumcore.mapper.MessageMapper;
 import com.example.forumcore.repository.MessageRepository;
 import com.example.forumcore.repository.TopicRepository;
-import com.example.userapp.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,27 +34,27 @@ public class MessageServiceImpl implements MessageService{
 
     @Override
     @Transactional
-    public UUID createMessage(MessageCreateRequest request, User user) {
+    public UUID createMessage(MessageCreateRequest request, UserDto user) {
         if (request.getTopicId() == null) {
             throw new IllegalStateException("Topic ID must not be null");
         }
         Message message = new Message();
         message.setText(request.getText());
-        message.setAuthor(user.getFirstName() + " " + user.getLastName());
+        message.setAuthor(user.firstName() + " " + user.lastName());
         message.setTopic(topicRepository.findById(request.getTopicId())
                 .orElseThrow(() -> new NotFoundException("Topic with ID " + request.getTopicId() + " not found")));
-        message.setCreatedBy(user.getId());
+        message.setCreatedBy(user.id());
         Message savedMessage = messageRepository.save(message);
         return savedMessage.getId();
     }
 
     @Override
     @Transactional
-    public UUID updateMessage(UUID id, MessageUpdateRequest request, User user) {
+    public UUID updateMessage(UUID id, MessageUpdateRequest request, UserDto user) {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Message with ID " + id + " not found"));
 
-        if (!message.getCreatedBy().equals(user.getId())) {
+        if (!message.getCreatedBy().equals(user.id())) {
             throw new AccessNotAllowedException("You do not have permission to update this message");
         }
 
@@ -66,11 +65,11 @@ public class MessageServiceImpl implements MessageService{
 
     @Override
     @Transactional
-    public void deleteMessage(UUID id, User user) {
+    public void deleteMessage(UUID id, UserDto user) {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Message with ID " + id + " not found"));
 
-        if (!message.getCreatedBy().equals(user.getId())) {
+        if (!message.getCreatedBy().equals(user.id())) {
             throw new AccessNotAllowedException("You do not have permission to delete this message");
         }
 

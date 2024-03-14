@@ -1,5 +1,6 @@
 package com.example.forumcore.service.topic;
 
+import com.example.common.dto.UserDto;
 import com.example.common.exception.AccessNotAllowedException;
 import com.example.common.exception.NotFoundException;
 import com.example.forumcore.dto.PageResponse;
@@ -7,12 +8,10 @@ import com.example.forumcore.dto.request.topic.TopicRequest;
 import com.example.forumcore.dto.response.TopicResponse;
 import com.example.forumcore.entity.Category;
 import com.example.forumcore.entity.Topic;
-import com.example.forumcore.enums.MessageSortType;
 import com.example.forumcore.enums.TopicSortType;
 import com.example.forumcore.repository.CategoryRepository;
 import com.example.forumcore.repository.MessageRepository;
 import com.example.forumcore.repository.TopicRepository;
-import com.example.userapp.entity.User;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,7 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     @Transactional
-    public UUID createTopic(TopicRequest topicRequest, User user) {
+    public UUID createTopic(TopicRequest topicRequest, UserDto user) {
         if (topicRequest.getCategoryId() == null) {
             throw new IllegalStateException("Category Id must not be null");
         }
@@ -48,7 +47,7 @@ public class TopicServiceImpl implements TopicService {
 
         Topic topic = new Topic();
         topic.setName(topicRequest.getName());
-        topic.setCreatedBy(user.getId());
+        topic.setCreatedBy(user.id());
         topic.setCategory(category);
 
         Topic savedTopic = topicRepository.save(topic);
@@ -57,11 +56,11 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     @Transactional
-    public UUID updateTopic(UUID id, TopicRequest updatedTopic, User user) {
+    public UUID updateTopic(UUID id, TopicRequest updatedTopic, UserDto user) {
         Topic topic = topicRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Topic with ID " + id + " not found"));
 
-        if (!topic.getCreatedBy().equals(user.getId())) {
+        if (!topic.getCreatedBy().equals(user.id())) {
             throw new AccessNotAllowedException("You do not have permission to update this topic");
         }
 
@@ -75,11 +74,11 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     @Transactional
-    public void deleteTopic(UUID id, User user) {
+    public void deleteTopic(UUID id, UserDto user) {
         Topic topic = topicRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Topic with ID " + id + " not found"));
 
-        if (!topic.getCreatedBy().equals(user.getId())) {
+        if (!topic.getCreatedBy().equals(user.id())) {
             throw new AccessNotAllowedException("You do not have permission to delete this topic");
         }
 
