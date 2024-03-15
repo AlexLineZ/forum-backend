@@ -8,6 +8,7 @@ import com.example.forumcore.dto.request.category.CategoryUpdateRequest;
 import com.example.forumcore.dto.response.CategoryResponse;
 import com.example.forumcore.entity.Category;
 import com.example.forumcore.entity.Topic;
+import com.example.forumcore.enums.CategorySortType;
 import com.example.forumcore.repository.CategoryRepository;
 import com.example.forumcore.repository.MessageRepository;
 import com.example.forumcore.repository.TopicRepository;
@@ -75,9 +76,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public List<CategoryResponse> getAllCategoriesHierarchy() {
+    public List<CategoryResponse> getAllCategoriesHierarchy(CategorySortType sortType) {
         List<Category> categories = categoryRepository.findAll();
-        return buildHierarchy(categories, null);
+        return buildHierarchy(categories, null, sortType);
     }
 
     @Override
@@ -97,12 +98,12 @@ public class CategoryServiceImpl implements CategoryService {
                 .toList();
     }
 
-    private List<CategoryResponse> buildHierarchy(List<Category> categories, UUID parentId) {
+    private List<CategoryResponse> buildHierarchy(List<Category> categories, UUID parentId, CategorySortType sortType) {
         List<CategoryResponse> hierarchy = new ArrayList<>();
         for (Category category : categories) {
             if ((parentId == null && category.getParentCategory() == null) ||
                     (category.getParentCategory() != null && Objects.equals(parentId, category.getParentCategory().getId()))) {
-                List<CategoryResponse> childCategories = buildHierarchy(categories, category.getId());
+                List<CategoryResponse> childCategories = buildHierarchy(categories, category.getId(), sortType);
                 CategoryResponse categoryResponse = new CategoryResponse(
                         category.getId(),
                         category.getName(),
@@ -115,7 +116,7 @@ public class CategoryServiceImpl implements CategoryService {
                 hierarchy.add(categoryResponse);
             }
         }
-        hierarchy.sort(Comparator.comparing(CategoryResponse::name));
+        hierarchy.sort(sortType.toSort());
         return hierarchy;
     }
 

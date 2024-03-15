@@ -4,6 +4,7 @@ import com.example.common.dto.UserDto;
 import com.example.forumcore.dto.request.category.CategoryCreateRequest;
 import com.example.forumcore.dto.request.category.CategoryUpdateRequest;
 import com.example.forumcore.dto.response.CategoryResponse;
+import com.example.forumcore.enums.CategorySortType;
 import com.example.forumcore.service.category.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -95,8 +96,10 @@ public class CategoryController {
                     content = @Content(mediaType = "application/json"))
     })
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
-        return ResponseEntity.ok(categoryService.getAllCategoriesHierarchy());
+    public ResponseEntity<List<CategoryResponse>> getAllCategories(
+            @RequestParam(name = "sort", defaultValue = "NAME_ASC") CategorySortType sortType
+    ) {
+        return ResponseEntity.ok(categoryService.getAllCategoriesHierarchy(sortType));
     }
 
     @Operation(summary = "Найти категорию по имени")
