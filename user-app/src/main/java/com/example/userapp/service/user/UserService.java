@@ -1,6 +1,7 @@
 package com.example.userapp.service.user;
 
 import com.example.common.dto.UserDto;
+import com.example.common.exception.CustomDuplicateFieldException;
 import com.example.common.exception.UserNotFoundException;
 import com.example.security.jwt.JwtTokenUtils;
 import com.example.userapp.dto.TokenResponse;
@@ -29,6 +30,12 @@ public class UserService implements UserDetailsService {
 
     public TokenResponse registerUser(RegisterRequest body) {
         User user = UserMapper.mapRegisterBodyToUser(body);
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new CustomDuplicateFieldException("Email already exists");
+        }
+        if (userRepository.existsByPhone(user.getPhone())) {
+            throw new CustomDuplicateFieldException("Phone already exists");
+        }
         userRepository.save(user);
 
         return TokenResponse.builder()

@@ -1,11 +1,13 @@
 package com.example.userapp.handler;
 
 import com.example.common.exception.AccessNotAllowedException;
+import com.example.common.exception.CustomDuplicateFieldException;
 import com.example.common.exception.NotFoundException;
 import com.example.common.exception.UserNotFoundException;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -18,6 +20,10 @@ import java.util.List;
 
 @ControllerAdvice
 public class UserExceptionHandler {
+    @ExceptionHandler(CustomDuplicateFieldException.class)
+    public ResponseEntity<String> handleCustomDuplicateFieldException(CustomDuplicateFieldException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
-@FeignClient(name = "USER-SERVICE")
+@FeignClient(name = "USER-APP", url = "http://localhost:8084")
 public interface UserAppClient {
     @GetMapping("api/users/person")
     ResponseEntity<UserDto> getUserById(@RequestParam("userId") UUID userId);

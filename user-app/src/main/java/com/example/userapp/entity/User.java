@@ -43,7 +43,7 @@ public class User implements UserDetails {
     @Column(unique = true)
     private Long phone;
 
-    @Size(min = 8, message = "Password must be at least 8 characters")
+    @Size(min = 6, message = "Password must be at least 6 characters")
     @NotBlank(message = "User password cannot be empty")
     private String password;
 
