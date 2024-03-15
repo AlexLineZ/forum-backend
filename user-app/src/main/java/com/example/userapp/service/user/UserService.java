@@ -1,6 +1,5 @@
 package com.example.userapp.service.user;
 
-import com.example.common.exception.NotFoundException;
 import com.example.common.exception.UserNotFoundException;
 import com.example.userapp.dto.TokenResponse;
 import com.example.userapp.dto.request.LoginRequest;
@@ -16,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -27,6 +27,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final JwtTokenUtils jwtTokenUtils;
 
+    @Transactional
     public TokenResponse registerUser(RegisterRequest body) {
         User user = UserMapper.mapRegisterBodyToUser(body);
         userRepository.save(user);

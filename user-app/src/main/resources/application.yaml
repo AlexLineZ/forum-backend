@@ -17,9 +17,9 @@ spring:
       hibernate:
         format_sql: true
   datasource:
-    url: jdbc:postgresql://localhost:5431/user
-    username: user
-    password: user
+    url: jdbc:postgresql://localhost:5430/forum
+    username: forum
+    password: forum
   flyway:
     enabled: true
     locations:
@@ -32,3 +32,9 @@ eureka:
 springdoc:
   swagger-ui:
     enabled: true
+
+logging:
+  level:
+    org:
+      springframework: DEBUG
+      hibernate: DEBUG

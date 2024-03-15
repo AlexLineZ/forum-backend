@@ -34,13 +34,11 @@ public class JwtTokenUtils {
 
         Date issuedDate = new Date();
         Date expiredDate = new Date(issuedDate.getTime() + jwtLifetime.toMillis());
-        UUID tokenId = UUID.randomUUID();
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(user.getEmail())
                 .claim("userId", user.getId().toString())
-                .setId(tokenId.toString())
                 .setIssuedAt(issuedDate)
                 .setExpiration(expiredDate)
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
