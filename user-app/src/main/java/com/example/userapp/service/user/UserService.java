@@ -36,7 +36,7 @@ public class UserService implements UserDetailsService {
         if (userRepository.existsByPhone(user.getPhone())) {
             throw new CustomDuplicateFieldException("Phone already exists");
         }
-        userRepository.save(user);
+        userRepository.saveAndFlush(user);
 
         return TokenResponse.builder()
                 .accessToken(jwtTokenUtils.generateToken(UserMapper.userToUserDto(user)))
