@@ -10,6 +10,7 @@ public record UserDto(
         String email,
         Long phone,
         Date registrationDate,
-        Date lastUpdateDate
+        Date lastUpdateDate,
+        Boolean isEnabled
 ) { }
 

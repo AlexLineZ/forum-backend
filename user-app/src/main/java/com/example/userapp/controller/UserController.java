@@ -58,4 +58,10 @@ public class UserController {
     public ResponseEntity<UserDto> getUserById(@RequestParam("userId") UUID userId) {
         return ResponseEntity.ok(userService.getUserByUserId(userId));
     }
+
+    @RequestMapping(value="/confirm-account", method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity<Void> confirmUserAccount(@RequestParam("token") UUID confirmationToken) {
+        userService.confirmEmail(confirmationToken);
+        return ResponseEntity.ok().build();
+    }
 }

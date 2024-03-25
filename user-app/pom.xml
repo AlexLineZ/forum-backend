@@ -17,6 +17,7 @@
     <properties>
         <java.version>17</java.version>
         <secutiry.version>3.2.3</secutiry.version>
+        <mail.version>2.1.2</mail.version>
     </properties>
 
     <dependencies>
@@ -36,6 +37,18 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
             <version>${secutiry.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+            <version>${secutiry.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
+            <version>${mail.version}</version>
         </dependency>
     </dependencies>
 

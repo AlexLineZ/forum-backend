@@ -24,6 +24,18 @@ spring:
     enabled: true
     locations:
       - migrations
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: alex.rashevskiy222@gmail.com
+    password: mlgowogybtytfomo
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    test-connection: true
 eureka:
   client:
     service-url:

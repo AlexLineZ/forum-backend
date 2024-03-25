@@ -8,11 +8,15 @@ import com.example.userapp.dto.TokenResponse;
 import com.example.userapp.dto.request.LoginRequest;
 import com.example.userapp.dto.request.RegisterRequest;
 import com.example.userapp.dto.response.UserResponse;
+import com.example.userapp.entity.ConfirmationToken;
 import com.example.userapp.entity.User;
+import com.example.userapp.exception.CouldNotVerifyEmailException;
 import com.example.userapp.mapper.UserMapper;
+import com.example.userapp.repository.ConfirmationTokenRepository;
 import com.example.userapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,12 +25,16 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.example.userapp.config.MessageConfig.*;
+
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final JwtTokenUtils jwtTokenUtils;
+    private final ConfirmationTokenRepository confirmationTokenRepository;
+    private final EmailService emailService;
 
     public TokenResponse registerUser(RegisterRequest body) {
         User user = UserMapper.mapRegisterBodyToUser(body);
@@ -36,7 +44,13 @@ public class UserService implements UserDetailsService {
         if (userRepository.existsByPhone(user.getPhone())) {
             throw new CustomDuplicateFieldException("Phone already exists");
         }
-        userRepository.saveAndFlush(user);
+        User newUser = userRepository.save(user);
+
+        ConfirmationToken confirmationToken = new ConfirmationToken();
+        confirmationToken.setUser(newUser);
+        confirmationTokenRepository.save(confirmationToken);
+
+        emailService.sendMessageToEmail(user.getEmail(), confirmationToken.getConfirmationToken());
 
         return TokenResponse.builder()
                 .accessToken(jwtTokenUtils.generateToken(UserMapper.userToUserDto(user)))
@@ -79,8 +93,22 @@ public class UserService implements UserDetailsService {
                 user.getEmail(),
                 user.getPhone(),
                 user.getRegistrationDate(),
-                user.getLastUpdateDate()
+                user.getLastUpdateDate(),
+                user.isEnabled()
         );
+    }
+
+    public void confirmEmail(UUID confirmationToken) {
+        ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
+
+        if (token != null)
+        {
+            User user = userRepository.findByEmailIgnoreCase(token.getUser().getEmail());
+            user.setEnabled(true);
+            userRepository.save(user);
+        } else {
+            throw new CouldNotVerifyEmailException("Couldn't verify email");
+        }
     }
 
     @Override

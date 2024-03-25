@@ -47,6 +47,8 @@ public class User implements UserDetails {
     @NotBlank(message = "User password cannot be empty")
     private String password;
 
+    private boolean isEnabled;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
