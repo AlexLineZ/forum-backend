@@ -1,0 +1,33 @@
+version: '3.9'
+services:
+  db:
+    container_name: metadata-db
+    image: postgres:12
+    hostname: metadata-db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=file
+      - POSTGRES_USER=file
+      - POSTGRES_PASSWORD=file
+    ports:
+      - "5433:5432"
+  minio:
+    image: minio/minio
+    container_name: minio
+    volumes:
+      - ./minio/data:/data
+    ports:
+      - "9000:9000"
+    environment:
+      MINIO_ACCESS_KEY: accesskey
+      MINIO_SECRET_KEY: secretkey
+    command: server /data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+volumes:
+  db-data:

@@ -19,6 +19,11 @@ spring:
           uri: lb://USER-APP
           predicates:
             - Path=/api/users/**
+
+        - id: file-service
+          uri: lb://FILE-SERVICE
+          predicates:
+            - Path=/api/files/**
   main:
     web-application-type: reactive
 

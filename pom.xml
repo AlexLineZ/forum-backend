@@ -10,6 +10,7 @@
         <module>service-registry</module>
         <module>gateway</module>
         <module>security</module>
+        <module>file-service</module>
     </modules>
 
     <parent>
