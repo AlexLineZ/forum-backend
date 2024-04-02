@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -16,4 +17,6 @@ public class MessageCreateRequest {
 
     @NotNull(message = "Topic ID is required")
     private UUID topicId;
+
+    private List<UUID> fileIds;
 }

@@ -39,7 +39,8 @@ public class UserMapper {
                 user.getPhone(),
                 user.getRegistrationDate(),
                 user.getLastUpdateDate(),
-                user.isEnabled()
+                user.isEnabled(),
+                user.getRole()
         );
     }
 

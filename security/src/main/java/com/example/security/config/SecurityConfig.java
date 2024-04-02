@@ -29,18 +29,12 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(c -> c
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/users/profile").hasRole("ADMIN")
                         .requestMatchers("/api/users/update").authenticated()
-                        .requestMatchers("/api/users/profile").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/forum/categories/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/forum/categories/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/forum/categories/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/forum/topics/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/forum/topics/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/forum/topics/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/forum/messages/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/forum/messages/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/forum/messages/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/forum/categories/**", "/api/forum/topics/**", "/api/forum/messages/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/forum/categories/**", "/api/forum/topics/**", "/api/forum/messages/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/forum/categories/**", "/api/forum/topics/**", "/api/forum/messages/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

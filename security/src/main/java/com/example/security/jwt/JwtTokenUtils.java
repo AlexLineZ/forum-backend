@@ -40,6 +40,7 @@ public class JwtTokenUtils {
                 .setClaims(claims)
                 .setSubject(user.email())
                 .claim("userId", user.id().toString())
+                .claim("role", user)
                 .setId(tokenId.toString())
                 .setIssuedAt(issuedDate)
                 .setExpiration(expiredDate)

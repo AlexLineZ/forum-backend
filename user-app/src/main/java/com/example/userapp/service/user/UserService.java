@@ -1,6 +1,7 @@
 package com.example.userapp.service.user;
 
 import com.example.common.dto.UserDto;
+import com.example.common.enums.Role;
 import com.example.common.exception.CustomDuplicateFieldException;
 import com.example.common.exception.UserNotFoundException;
 import com.example.security.jwt.JwtTokenUtils;
@@ -20,6 +21,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -35,6 +37,7 @@ public class UserService implements UserDetailsService {
     private final JwtTokenUtils jwtTokenUtils;
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
 
     public TokenResponse registerUser(RegisterRequest body) {
         User user = UserMapper.mapRegisterBodyToUser(body);
@@ -44,6 +47,8 @@ public class UserService implements UserDetailsService {
         if (userRepository.existsByPhone(user.getPhone())) {
             throw new CustomDuplicateFieldException("Phone already exists");
         }
+        user.setRole(Role.USER);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         User newUser = userRepository.save(user);
 
         ConfirmationToken confirmationToken = new ConfirmationToken();
@@ -64,10 +69,9 @@ public class UserService implements UserDetailsService {
 
     public TokenResponse loginUser(LoginRequest body){
         User user = userRepository.findByEmail(body.email())
-                .filter(u -> Objects.equals(body.password(), u.getPassword()))
-                .orElse(null);
+                .orElseThrow(() -> new UserNotFoundException("Invalid login details"));
 
-        if (user == null){
+        if (!passwordEncoder.matches(body.password(), user.getPassword())) {
             throw new UserNotFoundException("Invalid login details");
         }
 
@@ -94,7 +98,8 @@ public class UserService implements UserDetailsService {
                 user.getPhone(),
                 user.getRegistrationDate(),
                 user.getLastUpdateDate(),
-                user.isEnabled()
+                user.isEnabled(),
+                user.getRole()
         );
     }
 

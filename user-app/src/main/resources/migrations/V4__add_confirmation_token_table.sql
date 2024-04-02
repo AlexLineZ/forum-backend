@@ -1,6 +1,3 @@
-ALTER TABLE users
-    ADD COLUMN is_enabled BOOLEAN NOT NULL DEFAULT FALSE;
-
 CREATE TABLE confirmation_token (
        token_id BIGSERIAL PRIMARY KEY,
        confirmation_token UUID NOT NULL,

@@ -1,5 +1,7 @@
 package com.example.common.dto;
 
+import com.example.common.enums.Role;
+
 import java.util.Date;
 import java.util.UUID;
 
@@ -11,6 +13,7 @@ public record UserDto(
         Long phone,
         Date registrationDate,
         Date lastUpdateDate,
-        Boolean isEnabled
+        Boolean isEnabled,
+        Role role
 ) { }
 
