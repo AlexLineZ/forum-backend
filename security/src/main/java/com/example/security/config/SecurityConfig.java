@@ -30,7 +30,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/profile").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/users/profile").authenticated()
                         .requestMatchers("/api/users/update").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/forum/categories/**", "/api/forum/topics/**", "/api/forum/messages/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/forum/categories/**", "/api/forum/topics/**", "/api/forum/messages/**").authenticated()

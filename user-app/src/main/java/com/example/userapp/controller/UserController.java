@@ -7,9 +7,8 @@ import com.example.userapp.dto.request.RegisterRequest;
 import com.example.userapp.dto.response.UserResponse;
 import com.example.userapp.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("api/users")
+@Tag(name = "Пользователь")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;

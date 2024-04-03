@@ -14,6 +14,7 @@ public record UserDto(
         Date registrationDate,
         Date lastUpdateDate,
         Boolean isEnabled,
+        Boolean isBlocked,
         Role role
 ) { }
 

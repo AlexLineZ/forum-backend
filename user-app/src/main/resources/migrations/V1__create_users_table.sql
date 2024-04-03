@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
     phone BIGINT UNIQUE,
     password VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL,
-    is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    is_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+    is_blocked BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT email_unique UNIQUE (email)
 );

@@ -45,7 +45,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     ResponseEntity<UserDto> responseEntity = userAppClient.getUserById(userId);
                     UserDto user = responseEntity.getBody();
-                    if (user != null) {
+
+                    if (user != null && user.isEnabled() && !user.isBlocked()) {
                         List<GrantedAuthority> authorities = Collections.singletonList(
                                 new SimpleGrantedAuthority("ROLE_" + user.role().name())
                         );
@@ -53,6 +54,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                                 user, jwt, authorities
                         );
                         SecurityContextHolder.getContext().setAuthentication(token);
+                    } else if (user != null && user.isBlocked()) {
+                        denyAccess(response, "Account is blocked.");
+                        return;
+                    } else {
+                        denyAccess(response, "Account is not activated.");
+                        return;
                     }
                 }
             } catch (ExpiredJwtException e) {
@@ -63,4 +70,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
+
+    private void denyAccess(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        String errorMessage = "{\"message\": \"" + message + "\"}";
+        response.getWriter().write(errorMessage);
+    }
 }
+
+
