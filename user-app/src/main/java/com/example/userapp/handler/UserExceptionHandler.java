@@ -4,6 +4,7 @@ import com.example.common.exception.AccessNotAllowedException;
 import com.example.common.exception.CustomDuplicateFieldException;
 import com.example.common.exception.NotFoundException;
 import com.example.common.exception.UserNotFoundException;
+import com.example.userapp.exception.InvalidTokenException;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -20,6 +21,11 @@ import java.util.List;
 
 @ControllerAdvice
 public class UserExceptionHandler {
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<String> handleInvalidTokenException(InvalidTokenException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(CustomDuplicateFieldException.class)
     public ResponseEntity<String> handleCustomDuplicateFieldException(CustomDuplicateFieldException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);

@@ -27,20 +27,36 @@ public class JwtTokenUtils {
     private String secret;
 
     @Value("${jwt.lifetime}")
-    private Duration jwtLifetime;
+    private Duration jwtAccessLifetime;
 
-    public String generateToken(UserDto user){
-        Map<String, Object> claims = new HashMap<>();
+    @Value("${jwt.refresh.expiration}")
+    private Duration jwtRefreshLifetime;
 
+    public String generateAccessToken(UserDto user){
         Date issuedDate = new Date();
-        Date expiredDate = new Date(issuedDate.getTime() + jwtLifetime.toMillis());
+        Date expiredDate = new Date(issuedDate.getTime() + jwtAccessLifetime.toMillis());
         UUID tokenId = UUID.randomUUID();
 
         return Jwts.builder()
-                .setClaims(claims)
                 .setSubject(user.email())
                 .claim("userId", user.id().toString())
-                .claim("role", user)
+                .claim("role", user.role())
+                .setId(tokenId.toString())
+                .setIssuedAt(issuedDate)
+                .setExpiration(expiredDate)
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateRefreshToken(UserDto user){
+        Date issuedDate = new Date();
+        Date expiredDate = new Date(issuedDate.getTime() + jwtRefreshLifetime.toMillis());
+        UUID tokenId = UUID.randomUUID();
+
+        return Jwts.builder()
+                .setSubject(user.email())
+                .claim("userId", user.id().toString())
+                .claim("role", user.role())
                 .setId(tokenId.toString())
                 .setIssuedAt(issuedDate)
                 .setExpiration(expiredDate)
@@ -67,7 +83,7 @@ public class JwtTokenUtils {
         return getAllClaimsFromToken(token).getId();
     }
 
-    private SecretKey getSignKey() {
+    public SecretKey getSignKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }

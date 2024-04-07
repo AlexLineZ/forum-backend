@@ -13,6 +13,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        ddl-auto: validate
   datasource:
     url: jdbc:postgresql://localhost:5433/file
     username: file

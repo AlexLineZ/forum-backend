@@ -29,10 +29,10 @@ import java.util.UUID;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final JwtTokenUtils jwtTokenUtils;
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
 
     public TokenResponse registerUser(RegisterRequest body) {
         User user = UserMapper.mapRegisterBodyToUser(body);
@@ -52,12 +52,10 @@ public class UserService implements UserDetailsService {
 
         emailService.sendMessageToEmail(user.getEmail(), confirmationToken.getConfirmationToken());
 
-        return TokenResponse.builder()
-                .accessToken(jwtTokenUtils.generateToken(UserMapper.userToUserDto(user)))
-                .build();
+        return tokenService.getTokens(UserMapper.userToUserDto(newUser));
     }
 
-    public UserResponse getUserResponseByAuthentication(UserDto userDto) {
+    public UserResponse getUserByDto(UserDto userDto) {
         User user = getUserByAuthentication(userDto);
         return UserMapper.mapUserToResponse(user);
     }
@@ -70,9 +68,7 @@ public class UserService implements UserDetailsService {
             throw new UserNotFoundException("Invalid login details");
         }
 
-        return TokenResponse.builder()
-                .accessToken(jwtTokenUtils.generateToken(UserMapper.userToUserDto(user)))
-                .build();
+        return tokenService.getTokens(UserMapper.userToUserDto(user));
     }
 
 
@@ -85,18 +81,7 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + userId + " not found"));
 
-        return new UserDto(
-                user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getPhone(),
-                user.getRegistrationDate(),
-                user.getLastUpdateDate(),
-                user.isEnabled(),
-                user.isBlocked(),
-                user.getRole()
-        );
+        return UserMapper.userToUserDto(user);
     }
 
     public void confirmEmail(UUID confirmationToken) {

@@ -4,6 +4,8 @@ server:
 jwt:
   secret: r1Wq3Y7Ql8ivrpC4A6vEgBg1kllCKCrFkwhbZUNZ6Y8=
   lifetime: 30m
+  refresh:
+    expiration: 1d
 
 spring:
   application:
@@ -16,6 +18,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        ddl-auto: validate
   datasource:
     url: jdbc:postgresql://localhost:5431/user
     username: user

@@ -30,12 +30,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final JwtTokenUtils jwtTokenUtils;
     private final UserAppClient userAppClient;
 
+    private final List<String> allowedPaths = List.of("/api/users/login", "/api/users/register", "/api/token");
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             @NotNull HttpServletResponse response,
             @NotNull FilterChain filterChain
     ) throws ServletException, IOException {
+        String requestPath = request.getRequestURI();
+
+        if (allowedPaths.contains(requestPath)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
         String jwt = null;
         if (authHeader != null && authHeader.startsWith("Bearer ")) {

@@ -47,7 +47,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Не авторизирован")
     })
     public ResponseEntity<UserResponse> getUser(@AuthenticationPrincipal UserDto userDto) {
-        return ResponseEntity.ok(userService.getUserResponseByAuthentication(userDto));
+        return ResponseEntity.ok(userService.getUserByDto(userDto));
     }
 
     @GetMapping("person")

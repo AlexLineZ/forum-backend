@@ -16,6 +16,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        ddl-auto: validate
   datasource:
     url: jdbc:postgresql://localhost:5430/forum
     username: forum
