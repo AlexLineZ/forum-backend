@@ -1,8 +1,8 @@
 package com.example.userapp.mapper;
 
 import com.example.common.dto.UserDto;
-import com.example.userapp.dto.request.AdminRegisterRequest;
-import com.example.userapp.dto.request.RegisterRequest;
+import com.example.userapp.dto.request.admin.AdminRegisterRequest;
+import com.example.userapp.dto.request.user.RegisterRequest;
 import com.example.userapp.dto.response.UserResponse;
 import com.example.userapp.entity.User;
 import org.springframework.stereotype.Component;

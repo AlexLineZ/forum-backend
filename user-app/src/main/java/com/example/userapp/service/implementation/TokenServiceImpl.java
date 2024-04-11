@@ -1,4 +1,4 @@
-package com.example.userapp.service.user;
+package com.example.userapp.service.implementation;
 
 import com.example.common.dto.UserDto;
 import com.example.common.exception.UserNotFoundException;
@@ -10,6 +10,7 @@ import com.example.userapp.exception.InvalidTokenException;
 import com.example.userapp.mapper.UserMapper;
 import com.example.userapp.repository.RefreshTokenRepository;
 import com.example.userapp.repository.UserRepository;
+import com.example.userapp.service.TokenService;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class TokenService {
+public class TokenServiceImpl implements TokenService {
     private final RefreshTokenRepository refreshRepository;
     private final UserRepository userRepository;
     private final JwtTokenUtils jwtTokenUtils;
@@ -30,6 +31,7 @@ public class TokenService {
     @Value("${jwt.refresh.expiration}")
     private Duration lifetime;
 
+    @Override
     public TokenResponse getTokens(UserDto user){
         String accessToken = jwtTokenUtils.generateAccessToken(user);
         String refreshToken = jwtTokenUtils.generateRefreshToken(user);
@@ -40,6 +42,7 @@ public class TokenService {
         return new TokenResponse(accessToken, refreshToken);
     }
 
+    @Override
     public TokenResponse refreshAccessToken(String refreshToken) {
         if (!isRefreshTokenValid(refreshToken)) {
             throw new InvalidTokenException("Invalid or expired refresh token");

@@ -1,5 +1,6 @@
-package com.example.userapp.service.user;
+package com.example.userapp.service.implementation;
 
+import com.example.userapp.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,13 +14,14 @@ import static com.example.userapp.config.MessageConfig.*;
 
 @Service
 @RequiredArgsConstructor
-public class EmailService {
+public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender javaMailSender;
 
     @Value("${spring.mail.username}")
     private String emailFrom;
 
+    @Override
     public void sendMessageToEmail(String email, UUID confirmationToken){
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(email);

@@ -2,10 +2,10 @@ package com.example.userapp.controller;
 
 import com.example.common.dto.UserDto;
 import com.example.userapp.dto.TokenResponse;
-import com.example.userapp.dto.request.LoginRequest;
-import com.example.userapp.dto.request.RegisterRequest;
+import com.example.userapp.dto.request.user.LoginRequest;
+import com.example.userapp.dto.request.user.RegisterRequest;
 import com.example.userapp.dto.response.UserResponse;
-import com.example.userapp.service.user.UserService;
+import com.example.userapp.service.implementation.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

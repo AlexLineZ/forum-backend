@@ -1,4 +1,4 @@
-package com.example.userapp.dto.request;
+package com.example.userapp.dto.request.user;
 
 public record RegisterRequest(
         Long phone,

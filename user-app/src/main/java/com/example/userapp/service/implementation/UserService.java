@@ -1,13 +1,12 @@
-package com.example.userapp.service.user;
+package com.example.userapp.service.implementation;
 
 import com.example.common.dto.UserDto;
 import com.example.common.enums.Role;
 import com.example.common.exception.CustomDuplicateFieldException;
 import com.example.common.exception.UserNotFoundException;
-import com.example.security.jwt.JwtTokenUtils;
 import com.example.userapp.dto.TokenResponse;
-import com.example.userapp.dto.request.LoginRequest;
-import com.example.userapp.dto.request.RegisterRequest;
+import com.example.userapp.dto.request.user.LoginRequest;
+import com.example.userapp.dto.request.user.RegisterRequest;
 import com.example.userapp.dto.response.UserResponse;
 import com.example.userapp.entity.ConfirmationToken;
 import com.example.userapp.entity.User;
@@ -15,6 +14,8 @@ import com.example.userapp.exception.CouldNotVerifyEmailException;
 import com.example.userapp.mapper.UserMapper;
 import com.example.userapp.repository.ConfirmationTokenRepository;
 import com.example.userapp.repository.UserRepository;
+import com.example.userapp.service.EmailService;
+import com.example.userapp.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
