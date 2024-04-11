@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +17,7 @@ public class MessageCreateRequest {
     private String text;
 
     @NotNull(message = "Topic ID is required")
-    private UUID topicId;
+    private String topicId;
 
-    private List<UUID> fileIds;
+    private List<UUID> attachmentIds;
 }

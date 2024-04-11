@@ -1,15 +1,19 @@
 package com.example.forumcore.service.message;
 
+import com.example.common.dto.FileDto;
 import com.example.common.dto.UserDto;
 import com.example.common.exception.AccessNotAllowedException;
 import com.example.common.exception.NotFoundException;
+import com.example.forumcore.client.FileServiceClient;
 import com.example.forumcore.dto.PageResponse;
 import com.example.forumcore.dto.request.message.MessageCreateRequest;
 import com.example.forumcore.dto.request.message.MessageUpdateRequest;
 import com.example.forumcore.dto.response.MessageResponse;
+import com.example.forumcore.entity.Attachment;
 import com.example.forumcore.entity.Message;
 import com.example.forumcore.enums.MessageSortType;
 import com.example.forumcore.mapper.MessageMapper;
+import com.example.forumcore.repository.AttachmentRepository;
 import com.example.forumcore.repository.MessageRepository;
 import com.example.forumcore.repository.TopicRepository;
 import jakarta.transaction.Transactional;
@@ -20,10 +24,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +38,8 @@ public class MessageServiceImpl implements MessageService{
 
     private final TopicRepository topicRepository;
     private final MessageRepository messageRepository;
+    private final AttachmentRepository attachmentRepository;
+    private final FileServiceClient fileServiceClient;
 
     @Override
     @Transactional
@@ -38,14 +47,24 @@ public class MessageServiceImpl implements MessageService{
         if (request.getTopicId() == null) {
             throw new IllegalStateException("Topic ID must not be null");
         }
+
         Message message = new Message();
         message.setText(request.getText());
         message.setAuthor(user.firstName() + " " + user.lastName());
-        message.setTopic(topicRepository.findById(request.getTopicId())
+        message.setTopic(topicRepository.findById(toUUID(request.getTopicId()))
                 .orElseThrow(() -> new NotFoundException("Topic with ID " + request.getTopicId() + " not found")));
         message.setCreatedBy(user.id());
-        Message savedMessage = messageRepository.save(message);
-        return savedMessage.getId();
+
+
+        if (request.getAttachmentIds() != null && !request.getAttachmentIds().isEmpty()) {
+            List<Attachment> attachments = request.getAttachmentIds().stream()
+                    .map(fileId -> createAttachmentForMessage(fileId, message))
+                    .toList();
+            attachmentRepository.saveAll(attachments);
+        }
+
+        messageRepository.save(message);
+        return message.getId();
     }
 
     @Override
@@ -135,5 +154,27 @@ public class MessageServiceImpl implements MessageService{
                 .toList();
 
         return new PageResponse<>(messageResponses, page, size, messages.getTotalElements());
+    }
+
+    private static UUID toUUID(String str) {
+        try {
+            return UUID.fromString(str);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Uncorrected format UUID: " + str, e);
+        }
+    }
+
+    private Attachment createAttachmentForMessage(UUID fileId, Message message){
+        FileDto fileDto = fileServiceClient.getFileInfo(fileId);
+        if (fileDto == null) {
+            throw new NotFoundException("File with ID " + fileId + " not found");
+        }
+
+        Attachment attachment = new Attachment();
+        attachment.setMessage(message);
+        attachment.setName(fileDto.getName());
+        attachment.setSizeInBytes(fileDto.getSize());
+        attachment.setFileId(fileId);
+        return attachment;
     }
 }

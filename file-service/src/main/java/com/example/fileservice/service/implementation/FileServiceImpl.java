@@ -1,6 +1,6 @@
 package com.example.fileservice.service.implementation;
 
-import com.example.fileservice.dto.FileDto;
+import com.example.common.dto.FileDto;
 import com.example.fileservice.entity.MetaDataFile;
 import com.example.fileservice.exception.LoadFileException;
 import com.example.fileservice.repository.MetaDataFileRepository;
@@ -80,6 +80,20 @@ public class FileServiceImpl implements FileService {
         } catch (Exception e) {
             throw new LoadFileException("Error downloading file", e);
         }
+    }
+
+    @Override
+    public FileDto getFileInfo(UUID id) throws FileNotFoundException {
+        MetaDataFile metaDataFile = metaDataFileRepository.findById(id)
+                .orElseThrow(() -> new FileNotFoundException("File not found with id: " + id));
+
+        FileDto fileDto = new FileDto();
+        fileDto.setId(metaDataFile.getId().toString());
+        fileDto.setName(metaDataFile.getName());
+        fileDto.setSize(metaDataFile.getSize());
+        fileDto.setUploadTime(metaDataFile.getUploadTime());
+
+        return fileDto;
     }
 
     @Override

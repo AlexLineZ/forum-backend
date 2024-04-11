@@ -14,7 +14,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients(basePackages = "com.example.security.client")
+@EnableFeignClients(basePackages = { "com.example.security.client", "com.example.forumcore.client"})
 @Import({SecurityConfig.class, JwtRequestFilter.class, JwtTokenUtils.class})
 public class ForumCoreApplication {
 
