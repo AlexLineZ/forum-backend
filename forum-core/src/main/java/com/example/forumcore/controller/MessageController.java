@@ -8,6 +8,7 @@ import com.example.forumcore.dto.response.MessageResponse;
 import com.example.forumcore.enums.MessageSortType;
 import com.example.forumcore.service.message.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -16,10 +17,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 import java.time.LocalDateTime;
 
@@ -30,7 +34,6 @@ import java.time.LocalDateTime;
 public class MessageController {
     private final MessageService messageService;
 
-    @PostMapping
     @Operation(summary = "Создать новое сообщение в теме")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Успешно получено"),
@@ -41,6 +44,7 @@ public class MessageController {
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера",
                     content = @Content(mediaType = "application/json"))
     })
+    @PostMapping
     public ResponseEntity<UUID> createMessage(
             @Valid @RequestBody MessageCreateRequest request,
             @AuthenticationPrincipal UserDto user

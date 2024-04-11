@@ -1,5 +1,6 @@
 package com.example.forumcore.service.category;
 
+import com.example.common.client.UserAppClient;
 import com.example.common.dto.UserDto;
 import com.example.common.exception.AccessNotAllowedException;
 import com.example.common.exception.NotFoundException;
@@ -25,6 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final TopicRepository topicRepository;
     private final MessageRepository messageRepository;
+    private final UserAppClient userAppClient;
 
     @Override
     @Transactional
@@ -86,15 +88,21 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryResponse> searchCategoriesByName(String name) {
         List<Category> categories = categoryRepository.findByNameContainingIgnoreCase(name);
         return categories.stream()
-                .map(category -> new CategoryResponse(
-                        category.getId(),
-                        category.getName(),
-                        category.getCreatedAt(),
-                        category.getModifiedAt(),
-                        category.getCreatedBy(),
-                        Optional.ofNullable(category.getParentCategory()).map(Category::getId),
-                        Collections.emptyList()
-                ))
+                .map(category -> {
+                    UserDto user = userAppClient.getUserById(category.getCreatedBy());
+                    String fullName = user.firstName() + " " + user.lastName();
+
+                    return new CategoryResponse(
+                            category.getId(),
+                            category.getName(),
+                            category.getCreatedAt(),
+                            category.getModifiedAt(),
+                            category.getCreatedBy(),
+                            fullName,
+                            Optional.ofNullable(category.getParentCategory()).map(Category::getId),
+                            Collections.emptyList()
+                    );
+                })
                 .toList();
     }
 
@@ -104,12 +112,16 @@ public class CategoryServiceImpl implements CategoryService {
             if ((parentId == null && category.getParentCategory() == null) ||
                     (category.getParentCategory() != null && Objects.equals(parentId, category.getParentCategory().getId()))) {
                 List<CategoryResponse> childCategories = buildHierarchy(categories, category.getId(), sortType);
+                UserDto user = userAppClient.getUserById(category.getCreatedBy());
+                String fullName = user.firstName() + " " + user.lastName();
+
                 CategoryResponse categoryResponse = new CategoryResponse(
                         category.getId(),
                         category.getName(),
                         category.getCreatedAt(),
                         category.getModifiedAt(),
                         category.getCreatedBy(),
+                        fullName,
                         Optional.ofNullable(category.getParentCategory()).map(Category::getId),
                         childCategories
                 );

@@ -1,4 +1,4 @@
-package com.example.fileservice.dto;
+package com.example.common.dto;
 
 import lombok.Data;
 
@@ -11,4 +11,3 @@ public class FileDto {
     private long size;
     private LocalDateTime uploadTime;
 }
-

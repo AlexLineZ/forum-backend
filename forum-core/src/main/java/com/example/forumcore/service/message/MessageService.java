@@ -6,8 +6,10 @@ import com.example.forumcore.dto.request.message.MessageCreateRequest;
 import com.example.forumcore.dto.request.message.MessageUpdateRequest;
 import com.example.forumcore.dto.response.MessageResponse;
 import com.example.forumcore.enums.MessageSortType;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {

@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableAsync
-@EnableFeignClients(basePackages = "com.example.security.client")
+@EnableFeignClients(basePackages = "com.example.common.client")
 @Import({SecurityConfig.class, JwtRequestFilter.class, JwtTokenUtils.class})
 public class UserAppApplication {
 

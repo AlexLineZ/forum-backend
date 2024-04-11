@@ -9,6 +9,7 @@ public record TopicResponse(
         Date createdAt,
         Date modifiedAt,
         UUID createdBy,
+        String author,
         UUID categoryId
 ) {
 }

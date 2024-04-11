@@ -1,15 +1,19 @@
 package com.example.forumcore.service.message;
 
+import com.example.common.dto.FileDto;
 import com.example.common.dto.UserDto;
 import com.example.common.exception.AccessNotAllowedException;
 import com.example.common.exception.NotFoundException;
+import com.example.forumcore.client.FileServiceClient;
 import com.example.forumcore.dto.PageResponse;
 import com.example.forumcore.dto.request.message.MessageCreateRequest;
 import com.example.forumcore.dto.request.message.MessageUpdateRequest;
 import com.example.forumcore.dto.response.MessageResponse;
+import com.example.forumcore.entity.Attachment;
 import com.example.forumcore.entity.Message;
 import com.example.forumcore.enums.MessageSortType;
 import com.example.forumcore.mapper.MessageMapper;
+import com.example.forumcore.repository.AttachmentRepository;
 import com.example.forumcore.repository.MessageRepository;
 import com.example.forumcore.repository.TopicRepository;
 import jakarta.transaction.Transactional;
@@ -20,10 +24,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +40,8 @@ public class MessageServiceImpl implements MessageService{
 
     private final TopicRepository topicRepository;
     private final MessageRepository messageRepository;
+    private final AttachmentRepository attachmentRepository;
+    private final FileServiceClient fileServiceClient;
 
     @Override
     @Transactional
@@ -38,29 +49,45 @@ public class MessageServiceImpl implements MessageService{
         if (request.getTopicId() == null) {
             throw new IllegalStateException("Topic ID must not be null");
         }
+
         Message message = new Message();
         message.setText(request.getText());
         message.setAuthor(user.firstName() + " " + user.lastName());
-        message.setTopic(topicRepository.findById(request.getTopicId())
+        message.setTopic(topicRepository.findById(toUUID(request.getTopicId()))
                 .orElseThrow(() -> new NotFoundException("Topic with ID " + request.getTopicId() + " not found")));
         message.setCreatedBy(user.id());
-        Message savedMessage = messageRepository.save(message);
-        return savedMessage.getId();
+
+
+        if (request.getFilesIds() != null && !request.getFilesIds().isEmpty()) {
+            Set<UUID> uniqueFileIds = new HashSet<>(request.getFilesIds());
+
+            List<Attachment> attachments = uniqueFileIds.stream()
+                    .map(fileId -> createAttachmentForMessage(fileId, message))
+                    .collect(Collectors.toList());
+
+            attachmentRepository.saveAll(attachments);
+        }
+
+        messageRepository.save(message);
+        return message.getId();
     }
 
     @Override
     @Transactional
-    public UUID updateMessage(UUID id, MessageUpdateRequest request, UserDto user) {
-        Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Message with ID " + id + " not found"));
+    public UUID updateMessage(UUID messageId, MessageUpdateRequest request, UserDto user) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NotFoundException("Message with ID " + messageId + " not found"));
 
         if (!message.getCreatedBy().equals(user.id())) {
             throw new AccessNotAllowedException("You do not have permission to update this message");
         }
 
         message.setText(request.getText());
+
+        handleAttachments(message, request.getFilesIds());
+
         messageRepository.save(message);
-        return id;
+        return messageId;
     }
 
     @Override
@@ -135,5 +162,61 @@ public class MessageServiceImpl implements MessageService{
                 .toList();
 
         return new PageResponse<>(messageResponses, page, size, messages.getTotalElements());
+    }
+
+    private static UUID toUUID(String str) {
+        try {
+            return UUID.fromString(str);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Uncorrected format UUID: " + str, e);
+        }
+    }
+
+    private Attachment createAttachmentForMessage(UUID fileId, Message message){
+        FileDto fileDto = fileServiceClient.getFileInfo(fileId);
+        if (fileDto == null) {
+            throw new NotFoundException("File with ID " + fileId + " not found");
+        }
+
+        return createAttachment(fileDto, message);
+    }
+
+    private void handleAttachments(Message message, List<UUID> filesIds) {
+        if (filesIds != null) {
+            List<Attachment> currentAttachments = message.getAttachments();
+            List<UUID> currentFilesIds = currentAttachments.stream()
+                    .map(Attachment::getFileId)
+                    .toList();
+
+            Set<UUID> newFilesIds = new HashSet<>(filesIds);
+
+            List<UUID> filesIdsToAdd = newFilesIds.stream()
+                    .filter(id -> !currentFilesIds.contains(id))
+                    .toList();
+
+            List<Attachment> filesToRemove = currentAttachments.stream()
+                    .filter(attachment -> !newFilesIds.contains(attachment.getFileId()))
+                    .toList();
+
+            filesToRemove.forEach(attachment -> {
+                attachment.setMessage(null);
+                attachmentRepository.delete(attachment);
+            });
+
+            for (UUID attachmentId : filesIdsToAdd) {
+                FileDto fileInfo = fileServiceClient.getFileInfo(attachmentId);
+                Attachment newAttachment = createAttachment(fileInfo, message);
+                attachmentRepository.save(newAttachment);
+            }
+        }
+    }
+
+    public static Attachment createAttachment(FileDto fileDto, Message message) {
+        Attachment attachment = new Attachment();
+        attachment.setMessage(message);
+        attachment.setName(fileDto.getName());
+        attachment.setSizeInBytes(fileDto.getSize());
+        attachment.setFileId(UUID.fromString(fileDto.getId()));
+        return attachment;
     }
 }
