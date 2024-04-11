@@ -79,7 +79,7 @@ public class UserService implements UserDetailsService {
 
     public UserDto getUserByUserId(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + userId + " not found"));
+                .orElseThrow(() -> new UserNotFoundException("User with ID: " + userId + " not found"));
 
         return UserMapper.userToUserDto(user);
     }

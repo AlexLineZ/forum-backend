@@ -11,6 +11,7 @@ public record CategoryResponse(
         Date createdAt,
         Date modifiedAt,
         UUID createdBy,
+        String author,
         Optional<UUID> parentCategoryId,
         List<CategoryResponse> childCategories
 ) {}

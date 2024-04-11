@@ -1,5 +1,6 @@
 package com.example.forumcore.service.topic;
 
+import com.example.common.client.UserAppClient;
 import com.example.common.dto.UserDto;
 import com.example.common.exception.AccessNotAllowedException;
 import com.example.common.exception.NotFoundException;
@@ -30,6 +31,7 @@ public class TopicServiceImpl implements TopicService {
     private final TopicRepository topicRepository;
     private final CategoryRepository categoryRepository;
     private final MessageRepository messageRepository;
+    private final UserAppClient userAppClient;
 
     @Override
     @Transactional
@@ -108,13 +110,20 @@ public class TopicServiceImpl implements TopicService {
     @NotNull
     private PageResponse<TopicResponse> getTopicResponseCustomPage(Page<Topic> topics) {
         List<TopicResponse> content = topics.getContent().stream()
-                .map(topic -> new TopicResponse(
-                        topic.getId(),
-                        topic.getName(),
-                        topic.getCreatedAt(),
-                        topic.getModifiedAt(),
-                        topic.getCreatedBy(),
-                        topic.getCategory().getId()))
+                .map(topic -> {
+                    UserDto user = userAppClient.getUserById(topic.getCreatedBy());
+                    String creatorFullName = user.firstName() + " " + user.lastName();
+
+                    return new TopicResponse(
+                            topic.getId(),
+                            topic.getName(),
+                            topic.getCreatedAt(),
+                            topic.getModifiedAt(),
+                            topic.getCreatedBy(),
+                            creatorFullName,
+                            topic.getCategory().getId()
+                    );
+                })
                 .toList();
         return new PageResponse<>(content, topics.getNumber(), topics.getSize(), topics.getTotalElements());
     }

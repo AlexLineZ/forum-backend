@@ -1,7 +1,7 @@
 package com.example.security.jwt;
 
+import com.example.common.client.UserAppClient;
 import com.example.common.dto.UserDto;
-import com.example.security.client.UserAppClient;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -52,8 +52,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             try {
                 UUID userId = jwtTokenUtils.getUserIdFromToken(jwt);
                 if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    ResponseEntity<UserDto> responseEntity = userAppClient.getUserById(userId);
-                    UserDto user = responseEntity.getBody();
+                    UserDto user = userAppClient.getUserById(userId);
 
                     if (user != null && user.isEnabled() && !user.isBlocked()) {
                         List<GrantedAuthority> authorities = Collections.singletonList(
