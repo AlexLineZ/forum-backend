@@ -28,7 +28,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -56,10 +58,13 @@ public class MessageServiceImpl implements MessageService{
         message.setCreatedBy(user.id());
 
 
-        if (request.getAttachmentIds() != null && !request.getAttachmentIds().isEmpty()) {
-            List<Attachment> attachments = request.getAttachmentIds().stream()
+        if (request.getFilesIds() != null && !request.getFilesIds().isEmpty()) {
+            Set<UUID> uniqueFileIds = new HashSet<>(request.getFilesIds());
+
+            List<Attachment> attachments = uniqueFileIds.stream()
                     .map(fileId -> createAttachmentForMessage(fileId, message))
-                    .toList();
+                    .collect(Collectors.toList());
+
             attachmentRepository.saveAll(attachments);
         }
 
@@ -69,17 +74,20 @@ public class MessageServiceImpl implements MessageService{
 
     @Override
     @Transactional
-    public UUID updateMessage(UUID id, MessageUpdateRequest request, UserDto user) {
-        Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Message with ID " + id + " not found"));
+    public UUID updateMessage(UUID messageId, MessageUpdateRequest request, UserDto user) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NotFoundException("Message with ID " + messageId + " not found"));
 
         if (!message.getCreatedBy().equals(user.id())) {
             throw new AccessNotAllowedException("You do not have permission to update this message");
         }
 
         message.setText(request.getText());
+
+        handleAttachments(message, request.getFilesIds());
+
         messageRepository.save(message);
-        return id;
+        return messageId;
     }
 
     @Override
@@ -170,11 +178,45 @@ public class MessageServiceImpl implements MessageService{
             throw new NotFoundException("File with ID " + fileId + " not found");
         }
 
+        return createAttachment(fileDto, message);
+    }
+
+    private void handleAttachments(Message message, List<UUID> filesIds) {
+        if (filesIds != null) {
+            List<Attachment> currentAttachments = message.getAttachments();
+            List<UUID> currentFilesIds = currentAttachments.stream()
+                    .map(Attachment::getFileId)
+                    .toList();
+
+            Set<UUID> newFilesIds = new HashSet<>(filesIds);
+
+            List<UUID> filesIdsToAdd = newFilesIds.stream()
+                    .filter(id -> !currentFilesIds.contains(id))
+                    .toList();
+
+            List<Attachment> filesToRemove = currentAttachments.stream()
+                    .filter(attachment -> !newFilesIds.contains(attachment.getFileId()))
+                    .toList();
+
+            filesToRemove.forEach(attachment -> {
+                attachment.setMessage(null);
+                attachmentRepository.delete(attachment);
+            });
+
+            for (UUID attachmentId : filesIdsToAdd) {
+                FileDto fileInfo = fileServiceClient.getFileInfo(attachmentId);
+                Attachment newAttachment = createAttachment(fileInfo, message);
+                attachmentRepository.save(newAttachment);
+            }
+        }
+    }
+
+    public static Attachment createAttachment(FileDto fileDto, Message message) {
         Attachment attachment = new Attachment();
         attachment.setMessage(message);
         attachment.setName(fileDto.getName());
         attachment.setSizeInBytes(fileDto.getSize());
-        attachment.setFileId(fileId);
+        attachment.setFileId(UUID.fromString(fileDto.getId()));
         return attachment;
     }
 }

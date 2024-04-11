@@ -19,5 +19,5 @@ public class MessageCreateRequest {
     @NotNull(message = "Topic ID is required")
     private String topicId;
 
-    private List<UUID> attachmentIds;
+    private List<UUID> filesIds;
 }
