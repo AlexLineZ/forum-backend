@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients(basePackages = { "com.example.common.client", "com.example.forumcore.client"})
+@EnableFeignClients(basePackages = { "com.example.security.client", "com.example.forumcore.client"})
 @Import({SecurityConfig.class, JwtRequestFilter.class, JwtTokenUtils.class})
 public class ForumCoreApplication {
 

@@ -22,8 +22,7 @@ public class AdminController {
 
     @PostMapping("/user")
     public ResponseEntity<UUID> createUser(
-            @RequestBody AdminRegisterRequest user,
-            @AuthenticationPrincipal UserDto admin
+            @RequestBody AdminRegisterRequest user
     ) {
         return ResponseEntity.ok(adminService.createUser(user));
     }
@@ -31,8 +30,7 @@ public class AdminController {
     @PutMapping("/user/{id}")
     public ResponseEntity<UUID> updateUser(
             @PathVariable UUID id,
-            @RequestBody AdminUpdateRequest user,
-            @AuthenticationPrincipal UserDto admin
+            @RequestBody AdminUpdateRequest user
     ) {
         return ResponseEntity.ok(adminService.updateUser(id, user));
     }

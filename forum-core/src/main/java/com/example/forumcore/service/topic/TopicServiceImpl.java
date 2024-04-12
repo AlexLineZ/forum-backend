@@ -1,6 +1,5 @@
 package com.example.forumcore.service.topic;
 
-import com.example.common.client.UserAppClient;
 import com.example.common.dto.UserDto;
 import com.example.common.exception.AccessNotAllowedException;
 import com.example.common.exception.NotFoundException;
@@ -13,6 +12,7 @@ import com.example.forumcore.enums.TopicSortType;
 import com.example.forumcore.repository.CategoryRepository;
 import com.example.forumcore.repository.MessageRepository;
 import com.example.forumcore.repository.TopicRepository;
+import com.example.security.client.UserAppClient;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;

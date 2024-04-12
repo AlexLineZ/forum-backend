@@ -2,9 +2,9 @@ package com.example.forumcore.service.message;
 
 import com.example.common.dto.FileDto;
 import com.example.common.dto.UserDto;
+import com.example.common.enums.Role;
 import com.example.common.exception.AccessNotAllowedException;
 import com.example.common.exception.NotFoundException;
-import com.example.forumcore.client.FileServiceClient;
 import com.example.forumcore.dto.PageResponse;
 import com.example.forumcore.dto.request.message.MessageCreateRequest;
 import com.example.forumcore.dto.request.message.MessageUpdateRequest;
@@ -16,6 +16,7 @@ import com.example.forumcore.mapper.MessageMapper;
 import com.example.forumcore.repository.AttachmentRepository;
 import com.example.forumcore.repository.MessageRepository;
 import com.example.forumcore.repository.TopicRepository;
+import com.example.security.client.FileServiceClient;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -63,7 +64,7 @@ public class MessageServiceImpl implements MessageService{
 
             List<Attachment> attachments = uniqueFileIds.stream()
                     .map(fileId -> createAttachmentForMessage(fileId, message))
-                    .collect(Collectors.toList());
+                    .toList();
 
             attachmentRepository.saveAll(attachments);
         }
@@ -81,11 +82,7 @@ public class MessageServiceImpl implements MessageService{
         if (!message.getCreatedBy().equals(user.id())) {
             throw new AccessNotAllowedException("You do not have permission to update this message");
         }
-
         message.setText(request.getText());
-
-        handleAttachments(message, request.getFilesIds());
-
         messageRepository.save(message);
         return messageId;
     }
@@ -162,6 +159,48 @@ public class MessageServiceImpl implements MessageService{
         return new PageResponse<>(messageResponses, page, size, messages.getTotalElements());
     }
 
+    @Override
+    @Transactional
+    public void addAttachmentToMessage(UUID messageId, UUID fileId, UserDto user) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NotFoundException("Message with ID " + messageId + " not found"));
+
+        if (!message.getCreatedBy().equals(user.id())) {
+            throw new AccessNotAllowedException("Only the author of the message can add attachments.");
+        }
+
+        FileDto fileDto = fileServiceClient.getFileInfo(fileId);
+        if (fileDto == null) {
+            throw new NotFoundException("File with ID " + fileId + " not found");
+        }
+
+        Attachment attachment = createAttachment(fileDto, message);
+        attachmentRepository.save(attachment);
+    }
+
+
+    @Override
+    @Transactional
+    public void deleteAttachment(UUID messageId, UUID attachmentId, UserDto user) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NotFoundException("Message with ID " + messageId + " not found"));
+
+        if (!message.getCreatedBy().equals(user.id()) && !user.role().equals(Role.ADMIN)) {
+            throw new AccessNotAllowedException("You do not have permission to delete this attachment");
+        }
+
+        Attachment attachment = attachmentRepository.findById(attachmentId)
+                .orElseThrow(() -> new NotFoundException("Attachment with ID " + attachmentId + " not found"));
+
+        if (!attachment.getMessage().getId().equals(messageId)) {
+            throw new IllegalArgumentException("Attachment does not belong to the message");
+        }
+
+        attachmentRepository.delete(attachment);
+
+        //fileServiceClient.deleteFile(attachment.getFileId());
+    }
+
     private static UUID toUUID(String str) {
         try {
             return UUID.fromString(str);
@@ -177,36 +216,6 @@ public class MessageServiceImpl implements MessageService{
         }
 
         return createAttachment(fileDto, message);
-    }
-
-    private void handleAttachments(Message message, List<UUID> filesIds) {
-        if (filesIds != null) {
-            List<Attachment> currentAttachments = message.getAttachments();
-            List<UUID> currentFilesIds = currentAttachments.stream()
-                    .map(Attachment::getFileId)
-                    .toList();
-
-            Set<UUID> newFilesIds = new HashSet<>(filesIds);
-
-            List<UUID> filesIdsToAdd = newFilesIds.stream()
-                    .filter(id -> !currentFilesIds.contains(id))
-                    .toList();
-
-            List<Attachment> filesToRemove = currentAttachments.stream()
-                    .filter(attachment -> !newFilesIds.contains(attachment.getFileId()))
-                    .toList();
-
-            filesToRemove.forEach(attachment -> {
-                attachment.setMessage(null);
-                attachmentRepository.delete(attachment);
-            });
-
-            for (UUID attachmentId : filesIdsToAdd) {
-                FileDto fileInfo = fileServiceClient.getFileInfo(attachmentId);
-                Attachment newAttachment = createAttachment(fileInfo, message);
-                attachmentRepository.save(newAttachment);
-            }
-        }
     }
 
     public static Attachment createAttachment(FileDto fileDto, Message message) {

@@ -88,4 +88,24 @@ public class MessageController {
                 .searchMessages(text, dateFrom, dateTo, createdBy, topicId, categoryId, page, size);
         return ResponseEntity.ok(messages);
     }
+
+    @Operation(summary = "Добавить вложение к сообщению")
+    @PostMapping("/{messageId}/attachments")
+    public ResponseEntity<Void> addAttachmentToMessage(
+            @PathVariable UUID messageId,
+            @RequestParam("fileId") UUID fileId,
+            @AuthenticationPrincipal UserDto user) {
+        messageService.addAttachmentToMessage(messageId, fileId, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Удалить вложение с сообщения")
+    @DeleteMapping("/{messageId}/attachments/{attachmentId}")
+    public ResponseEntity<Void> deleteAttachment(
+            @PathVariable UUID messageId,
+            @PathVariable UUID attachmentId,
+            @AuthenticationPrincipal UserDto user) {
+        messageService.deleteAttachment(messageId, attachmentId, user);
+        return ResponseEntity.ok().build();
+    }
 }

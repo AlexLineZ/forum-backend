@@ -32,5 +32,8 @@ public interface MessageService {
             int page,
             int size
     );
+    void addAttachmentToMessage(UUID messageId, UUID fileId, UserDto user);
+
+    void deleteAttachment(UUID messageId, UUID attachmentId, UserDto user);
 }
 

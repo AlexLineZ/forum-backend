@@ -43,7 +43,7 @@ public class AdminServiceImpl implements AdminService {
         return userRepository.findById(id)
                 .map(user -> {
                     if (user.getRole().equals(Role.ADMIN) && request.role() != null && request.role().equals(Role.ADMIN)) {
-                        throw new AdminActionNotAllowedException("Admin cannot change the role of another admin.");
+                        throw new AdminActionNotAllowedException("Admin cannot change the role of another admin");
                     }
                     if (request.firstName() != null) user.setFirstName(request.firstName());
                     if (request.lastName() != null) user.setLastName(request.lastName());
@@ -59,7 +59,7 @@ public class AdminServiceImpl implements AdminService {
     public UUID blockUser(UUID id, UserDto admin) {
         UUID adminId = admin.id();
         if (id.equals(adminId)) {
-            throw new AdminActionNotAllowedException("Admin cannot block themselves.");
+            throw new AdminActionNotAllowedException("Admin cannot block themselves");
         }
 
         return userRepository.findById(id)
@@ -68,7 +68,7 @@ public class AdminServiceImpl implements AdminService {
                         throw new AdminActionNotAllowedException("Admin cannot block another admin");
                     }
                     if (user.isBlocked()) {
-                        throw new InvalidActionException("User is already blocked.");
+                        throw new InvalidActionException("User is already blocked");
                     }
                     user.setBlocked(true);
                     userRepository.save(user);

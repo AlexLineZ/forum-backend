@@ -12,6 +12,4 @@ public class MessageUpdateRequest {
     @NotBlank(message = "Text must not be null")
     @Size(min = 1, message = "Text must have at least 1 character")
     private String text;
-
-    private List<UUID> filesIds;
 }
