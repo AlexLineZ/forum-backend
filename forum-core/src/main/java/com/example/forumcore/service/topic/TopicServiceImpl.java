@@ -1,6 +1,7 @@
 package com.example.forumcore.service.topic;
 
 import com.example.common.dto.UserDto;
+import com.example.common.enums.Role;
 import com.example.common.exception.AccessNotAllowedException;
 import com.example.common.exception.NotFoundException;
 import com.example.forumcore.dto.PageResponse;
@@ -62,7 +63,7 @@ public class TopicServiceImpl implements TopicService {
         Topic topic = topicRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Topic with ID " + id + " not found"));
 
-        if (!topic.getCreatedBy().equals(user.id())) {
+        if (!topic.getCreatedBy().equals(user.id()) && !user.role().equals(Role.ADMIN)) {
             throw new AccessNotAllowedException("You do not have permission to update this topic");
         }
 
@@ -80,13 +81,14 @@ public class TopicServiceImpl implements TopicService {
         Topic topic = topicRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Topic with ID " + id + " not found"));
 
-        if (!topic.getCreatedBy().equals(user.id())) {
+        if (!topic.getCreatedBy().equals(user.id()) && !user.role().equals(Role.ADMIN)) {
             throw new AccessNotAllowedException("You do not have permission to delete this topic");
         }
 
         messageRepository.deleteByTopicId(id);
         topicRepository.deleteById(id);
     }
+
 
     @Override
     public PageResponse<TopicResponse> getTopics(int page, int size, TopicSortType sortType) {

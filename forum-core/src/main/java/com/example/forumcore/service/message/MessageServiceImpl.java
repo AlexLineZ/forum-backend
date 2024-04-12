@@ -17,6 +17,7 @@ import com.example.forumcore.repository.AttachmentRepository;
 import com.example.forumcore.repository.MessageRepository;
 import com.example.forumcore.repository.TopicRepository;
 import com.example.security.client.FileServiceClient;
+import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -93,7 +94,7 @@ public class MessageServiceImpl implements MessageService{
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Message with ID " + id + " not found"));
 
-        if (!message.getCreatedBy().equals(user.id())) {
+        if (!message.getCreatedBy().equals(user.id()) && !user.role().equals(Role.ADMIN)) {
             throw new AccessNotAllowedException("You do not have permission to delete this message");
         }
 
@@ -169,9 +170,15 @@ public class MessageServiceImpl implements MessageService{
             throw new AccessNotAllowedException("Only the author of the message can add attachments.");
         }
 
-        FileDto fileDto = fileServiceClient.getFileInfo(fileId);
-        if (fileDto == null) {
-            throw new NotFoundException("File with ID " + fileId + " not found");
+        FileDto fileDto;
+        try {
+            fileDto = fileServiceClient.getFileInfo(fileId);
+        } catch (FeignException e) {
+            if (e.status() == 404) {
+                throw new NotFoundException("File with ID " + fileId + " not found");
+            } else {
+                throw new IllegalArgumentException("Error communicating with file service", e);
+            }
         }
 
         Attachment attachment = createAttachment(fileDto, message);
@@ -210,9 +217,15 @@ public class MessageServiceImpl implements MessageService{
     }
 
     private Attachment createAttachmentForMessage(UUID fileId, Message message){
-        FileDto fileDto = fileServiceClient.getFileInfo(fileId);
-        if (fileDto == null) {
-            throw new NotFoundException("File with ID " + fileId + " not found");
+        FileDto fileDto;
+        try {
+            fileDto = fileServiceClient.getFileInfo(fileId);
+        } catch (FeignException e) {
+            if (e.status() == 404) {
+                throw new NotFoundException("File with ID " + fileId + " not found in file service");
+            } else {
+                throw new IllegalArgumentException("Error communicating with file service", e);
+            }
         }
 
         return createAttachment(fileDto, message);

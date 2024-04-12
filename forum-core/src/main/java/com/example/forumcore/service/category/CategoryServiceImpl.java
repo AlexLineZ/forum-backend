@@ -1,6 +1,7 @@
 package com.example.forumcore.service.category;
 
 import com.example.common.dto.UserDto;
+import com.example.common.enums.Role;
 import com.example.common.exception.AccessNotAllowedException;
 import com.example.common.exception.NotFoundException;
 import com.example.forumcore.dto.request.category.CategoryCreateRequest;
@@ -55,9 +56,11 @@ public class CategoryServiceImpl implements CategoryService {
     public UUID updateCategory(UUID id, CategoryUpdateRequest request, UserDto user) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
-        if (!category.getCreatedBy().equals(user.id())) {
-            throw new AccessNotAllowedException("User is not the author of the category");
+
+        if (!category.getCreatedBy().equals(user.id()) && !user.role().equals(Role.ADMIN)) {
+            throw new AccessNotAllowedException("User is not authorized to update this category");
         }
+
         category.setName(request.getName());
         categoryRepository.save(category);
         return category.getId();
@@ -69,12 +72,13 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category not found"));
 
-        if (!category.getCreatedBy().equals(user.id())) {
-            throw new AccessNotAllowedException("User is not the author of the category");
+        if (!category.getCreatedBy().equals(user.id()) && !user.role().equals(Role.ADMIN)) {
+            throw new AccessNotAllowedException("User is not authorized to delete this category");
         }
 
         deleteCategoryAndChildren(id);
     }
+
 
     @Override
     @Transactional
