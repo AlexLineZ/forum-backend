@@ -7,6 +7,7 @@ import com.example.common.exception.UserNotFoundException;
 import com.example.userapp.dto.TokenResponse;
 import com.example.userapp.dto.request.user.LoginRequest;
 import com.example.userapp.dto.request.user.RegisterRequest;
+import com.example.userapp.dto.request.user.UserUpdateRequest;
 import com.example.userapp.dto.response.UserResponse;
 import com.example.userapp.entity.ConfirmationToken;
 import com.example.userapp.entity.User;
@@ -45,7 +46,7 @@ public class UserService implements UserDetailsService {
         }
         user.setRole(Role.USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        User newUser = userRepository.save(user);
+        User newUser = userRepository.saveAndFlush(user);
 
         ConfirmationToken confirmationToken = new ConfirmationToken();
         confirmationToken.setUser(newUser);
@@ -54,11 +55,6 @@ public class UserService implements UserDetailsService {
         emailService.sendMessageToEmail(user.getEmail(), confirmationToken.getConfirmationToken());
 
         return tokenService.getTokens(UserMapper.userToUserDto(newUser));
-    }
-
-    public UserResponse getUserByDto(UserDto userDto) {
-        User user = getUserByAuthentication(userDto);
-        return UserMapper.mapUserToResponse(user);
     }
 
     public TokenResponse loginUser(LoginRequest body){
@@ -72,6 +68,24 @@ public class UserService implements UserDetailsService {
         return tokenService.getTokens(UserMapper.userToUserDto(user));
     }
 
+    public UserResponse updateUser(UserDto currentUser, UserUpdateRequest updateRequest){
+        User user = userRepository.findById(currentUser.id())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (updateRequest.getFirstName() != null) user.setFirstName(updateRequest.getFirstName());
+        if (updateRequest.getLastName() != null) user.setLastName(updateRequest.getLastName());
+        if (updateRequest.getPhone() != null) user.setPhone(updateRequest.getPhone());
+        if (updateRequest.getPassword() != null) user.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
+
+        User updatedUser = userRepository.save(user);
+
+        return UserMapper.mapUserToResponse(updatedUser);
+    }
+
+    public UserResponse getUserByDto(UserDto userDto) {
+        User user = getUserByAuthentication(userDto);
+        return UserMapper.mapUserToResponse(user);
+    }
 
     public User getUserByAuthentication(UserDto userDto) {
         return userRepository.findById(userDto.id())

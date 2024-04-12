@@ -116,8 +116,7 @@ public class MessageServiceImpl implements MessageService{
         Pageable pageable = PageRequest.of(page, size, sortType.toSort());
         Page<Message> messages = messageRepository.findByTopicId(topicId, pageable);
 
-        List<MessageResponse> messageResponses = messages.getContent()
-                .stream()
+        List<MessageResponse> messageResponses = messages
                 .map(MessageMapper::mapMessageToResponse)
                 .toList();
 
@@ -156,8 +155,7 @@ public class MessageServiceImpl implements MessageService{
         }
 
         Page<Message> messages = messageRepository.findAll(spec, pageable);
-        List<MessageResponse> messageResponses = messages.getContent()
-                .stream()
+        List<MessageResponse> messageResponses = messages
                 .map(MessageMapper::mapMessageToResponse)
                 .toList();
 

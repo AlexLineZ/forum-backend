@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 public class UserMapper {
     public static User mapRegisterBodyToUser(RegisterRequest body) {
         User user = new User();
-        user.setPassword(body.password());
-        user.setFirstName(body.firstName());
-        user.setLastName(body.lastName());
-        user.setEmail(body.email());
-        user.setPhone(body.phone());
+        user.setPassword(body.getPassword());
+        user.setFirstName(body.getFirstName());
+        user.setLastName(body.getLastName());
+        user.setEmail(body.getEmail());
+        user.setPhone(body.getPhone());
         return user;
     }
 

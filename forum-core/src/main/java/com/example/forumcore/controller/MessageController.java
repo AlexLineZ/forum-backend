@@ -35,15 +35,6 @@ public class MessageController {
     private final MessageService messageService;
 
     @Operation(summary = "Создать новое сообщение в теме")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешно получено"),
-            @ApiResponse(responseCode = "400", description = "Неверный запрос",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "Не авторизирован",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера",
-                    content = @Content(mediaType = "application/json"))
-    })
     @PostMapping
     public ResponseEntity<UUID> createMessage(
             @Valid @RequestBody MessageCreateRequest request,
@@ -53,19 +44,6 @@ public class MessageController {
     }
 
     @PutMapping("/{id}")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешно получено"),
-            @ApiResponse(responseCode = "400", description = "Неверный запрос",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "Не авторизирован",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "403", description = "Нет доступа",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "404", description = "Объект не найден",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера",
-                    content = @Content(mediaType = "application/json"))
-    })
     @Operation(summary = "Редактировать сообщение")
     public ResponseEntity<UUID> updateMessage(
             @PathVariable UUID id,
@@ -77,19 +55,6 @@ public class MessageController {
     }
 
     @DeleteMapping("/{id}")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешно получено"),
-            @ApiResponse(responseCode = "400", description = "Неверный запрос",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "Не авторизирован",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "403", description = "Нет доступа",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "404", description = "Объект не найден",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера",
-                    content = @Content(mediaType = "application/json"))
-    })
     @Operation(summary = "Удалить сообщение")
     public ResponseEntity<Void> deleteMessage(@PathVariable UUID id, @AuthenticationPrincipal UserDto user) {
         messageService.deleteMessage(id, user);
@@ -98,11 +63,6 @@ public class MessageController {
 
     @GetMapping("/topic/{topicId}")
     @Operation(summary = "Дать сообщения темы")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешно получено"),
-            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера",
-                    content = @Content(mediaType = "application/json"))
-    })
     public ResponseEntity<PageResponse<MessageResponse>> getMessagesByTopic(
             @PathVariable UUID topicId,
             @RequestParam(defaultValue = "0") int page,
@@ -114,11 +74,6 @@ public class MessageController {
 
     @GetMapping("/search")
     @Operation(summary = "Найти сообщения по критериям")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешно получено"),
-            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера",
-                    content = @Content(mediaType = "application/json"))
-    })
     public ResponseEntity<PageResponse<MessageResponse>> searchMessages(
             @RequestParam(required = false) String text,
             @RequestParam(required = false) LocalDateTime dateFrom,

@@ -27,15 +27,6 @@ public class TopicController {
     private final TopicService topicService;
 
     @Operation(summary = "Создать тему")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешно получено"),
-            @ApiResponse(responseCode = "400", description = "Неверный запрос",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "Не авторизирован",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера",
-                    content = @Content(mediaType = "application/json"))
-    })
     @PostMapping
     public ResponseEntity<UUID> createTopic(
             @Valid @RequestBody TopicRequest topic,
@@ -45,19 +36,6 @@ public class TopicController {
     }
 
     @Operation(summary = "Обновить тему")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешно получено"),
-            @ApiResponse(responseCode = "400", description = "Неверный запрос",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "Не авторизирован",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "403", description = "Нет доступа",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "404", description = "Объект не найден",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера",
-                    content = @Content(mediaType = "application/json"))
-    })
     @PutMapping("/{id}")
     public ResponseEntity<UUID> updateTopic(
             @PathVariable UUID id,
@@ -68,19 +46,6 @@ public class TopicController {
     }
 
     @Operation(summary = "Удалить тему")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешно получено"),
-            @ApiResponse(responseCode = "400", description = "Неверный запрос",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "Не авторизирован",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "403", description = "Нет доступа",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "404", description = "Объект не найден",
-                    content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера",
-                    content = @Content(mediaType = "application/json"))
-    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTopic(@PathVariable UUID id, @AuthenticationPrincipal UserDto user) {
         topicService.deleteTopic(id, user);
@@ -88,11 +53,6 @@ public class TopicController {
     }
 
     @Operation(summary = "Получить страницу тем форума")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешно получено"),
-            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера",
-                    content = @Content(mediaType = "application/json"))
-    })
     @GetMapping
     public ResponseEntity<PageResponse<TopicResponse>> getTopics(
             @RequestParam(defaultValue = "0") int page,
@@ -103,11 +63,6 @@ public class TopicController {
     }
 
     @Operation(summary = "Найти темы по названию")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Успешно получено"),
-            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера",
-                    content = @Content(mediaType = "application/json"))
-    })
     @GetMapping("/search")
     public ResponseEntity<PageResponse<TopicResponse>> searchTopicsByName(@RequestParam String name,
                                                                           @RequestParam(defaultValue = "0") int page,
