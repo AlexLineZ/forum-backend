@@ -3,7 +3,7 @@ package com.example.userapp.controller;
 import com.example.userapp.dto.TokenResponse;
 import com.example.userapp.dto.request.user.LoginRequest;
 import com.example.userapp.dto.request.user.RegisterRequest;
-import com.example.userapp.service.implementation.UserService;
+import com.example.userapp.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

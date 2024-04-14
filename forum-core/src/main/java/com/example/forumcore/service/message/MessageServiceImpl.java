@@ -1,11 +1,11 @@
 package com.example.forumcore.service.message;
 
 import com.example.common.dto.FileDto;
+import com.example.common.dto.PageResponse;
 import com.example.common.dto.UserDto;
 import com.example.common.enums.Role;
 import com.example.common.exception.AccessNotAllowedException;
 import com.example.common.exception.NotFoundException;
-import com.example.forumcore.dto.PageResponse;
 import com.example.forumcore.dto.request.message.MessageCreateRequest;
 import com.example.forumcore.dto.request.message.MessageUpdateRequest;
 import com.example.forumcore.dto.response.MessageResponse;
@@ -26,15 +26,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -94,7 +91,10 @@ public class MessageServiceImpl implements MessageService{
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Message with ID " + id + " not found"));
 
-        if (!message.getCreatedBy().equals(user.id()) && !user.role().equals(Role.ADMIN)) {
+        if (!message.getCreatedBy().equals(user.id())
+                && !user.role().equals(Role.ADMIN)
+                && !user.role().equals(Role.MODERATOR)
+        ) {
             throw new AccessNotAllowedException("You do not have permission to delete this message");
         }
 
@@ -185,14 +185,16 @@ public class MessageServiceImpl implements MessageService{
         attachmentRepository.save(attachment);
     }
 
-
     @Override
     @Transactional
     public void deleteAttachment(UUID messageId, UUID attachmentId, UserDto user) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NotFoundException("Message with ID " + messageId + " not found"));
 
-        if (!message.getCreatedBy().equals(user.id()) && !user.role().equals(Role.ADMIN)) {
+        if (!message.getCreatedBy().equals(user.id())
+                && !user.role().equals(Role.ADMIN)
+                && !user.role().equals(Role.MODERATOR)
+        ) {
             throw new AccessNotAllowedException("You do not have permission to delete this attachment");
         }
 
@@ -205,7 +207,15 @@ public class MessageServiceImpl implements MessageService{
 
         attachmentRepository.delete(attachment);
 
-        //fileServiceClient.deleteFile(attachment.getFileId());
+        try {
+            fileServiceClient.deleteFile(attachment.getFileId(), user);
+        } catch (FeignException e) {
+            if (e.status() == 404) {
+                throw new NotFoundException("File with ID " + attachment.getFileId() + " not found in file service");
+            } else {
+                throw new IllegalArgumentException("Error communicating with file service", e);
+            }
+        }
     }
 
     private static UUID toUUID(String str) {

@@ -28,8 +28,10 @@ import java.util.UUID;
 public class JwtRequestFilter extends OncePerRequestFilter {
     private final JwtTokenUtils jwtTokenUtils;
     private final UserAppClient userAppClient;
-
-    private final List<String> allowedPaths = List.of("/api/auth", "/api/token");
+    private final List<String> allowedPaths = List.of(
+            "/api/auth",
+            "/api/token"
+    );
 
     @Override
     protected void doFilterInternal(

@@ -15,7 +15,7 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-*.minio
+file-service/minio
 .idea
 *.iws
 *.iml

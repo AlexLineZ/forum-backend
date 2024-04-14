@@ -1,5 +1,6 @@
 package com.example.userapp.controller;
 
+import com.example.common.dto.PageResponse;
 import com.example.common.dto.UserDto;
 import com.example.common.enums.Role;
 import com.example.userapp.dto.request.admin.AdminRegisterRequest;
@@ -8,6 +9,7 @@ import com.example.userapp.service.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -74,5 +76,12 @@ public class AdminController {
     )
     public ResponseEntity<UUID> unblockUser(@PathVariable UUID id, @AuthenticationPrincipal UserDto admin) {
         return ResponseEntity.ok(adminService.unblockUser(id, admin));
+    }
+
+    @GetMapping("/users")
+    @Operation(summary = "Получение списка всех пользователей",
+            description = "Возвращает страницу с пользователями")
+    public ResponseEntity<PageResponse<UserDto>> getAllUsers(Pageable pageable) {
+        return ResponseEntity.ok(adminService.findAllUsers(pageable));
     }
 }

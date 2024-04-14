@@ -26,5 +26,8 @@ public class MetaDataFile {
 
     @Column(name = "upload_time")
     private LocalDateTime uploadTime;
+
+    @Column(name = "user_id")
+    private UUID userId;
 }
 

@@ -21,17 +21,17 @@ public class UserMapper {
 
     public static UserResponse mapUserToResponse(User user) {
         return new UserResponse(
-                user.getId().toString(),
+                user.getId(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getFirstName() + " " + user.getLastName(),
                 user.getEmail(),
                 user.getPhone(),
                 user.getRegistrationDate(),
-                user.getLastUpdateDate()
+                user.getLastUpdateDate(),
+                user.getRole()
         );
     }
-    public static UserDto userToUserDto(User user) {
+    public static UserDto mapUserToUserDto(User user) {
         return new UserDto(
                 user.getId(),
                 user.getFirstName(),

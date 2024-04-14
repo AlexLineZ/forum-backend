@@ -1,8 +1,12 @@
 package com.example.fileservice.service.implementation;
 
 import com.example.common.dto.FileDto;
+import com.example.common.dto.UserDto;
+import com.example.common.enums.Role;
+import com.example.common.exception.AccessNotAllowedException;
 import com.example.fileservice.entity.MetaDataFile;
 import com.example.fileservice.exception.LoadFileException;
+import com.example.fileservice.mapper.FileMapper;
 import com.example.fileservice.repository.MetaDataFileRepository;
 import com.example.fileservice.service.FileService;
 import com.example.fileservice.service.FilenameService;
@@ -11,6 +15,7 @@ import org.springframework.data.util.Pair;
 import io.minio.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
@@ -31,31 +36,26 @@ public class FileServiceImpl implements FileService {
     private String bucketName;
 
     @Override
-    public UUID uploadFile(MultipartFile file) {
-        UUID fileId = UUID.randomUUID();
+    @Transactional
+    public UUID uploadFile(MultipartFile file, UserDto user) {
         try {
             boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
             if (!found) {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
             }
 
+            MetaDataFile metaDataFile = FileMapper.fileToMetaData(file, user.id());
+            MetaDataFile newFile = metaDataFileRepository.save(metaDataFile);
+
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .bucket(bucketName)
-                            .object(fileId.toString())
+                            .object(newFile.getId().toString())
                             .stream(file.getInputStream(), file.getSize(), -1)
                             .contentType(file.getContentType())
                             .build());
 
-            MetaDataFile metaDataFile = new MetaDataFile(
-                    fileId,
-                    file.getOriginalFilename(),
-                    file.getSize(),
-                    LocalDateTime.now()
-            );
-            metaDataFileRepository.save(metaDataFile);
-
-            return fileId;
+            return newFile.getId();
         } catch (Exception e) {
             throw new LoadFileException("Error uploading file", e);
         }
@@ -87,25 +87,38 @@ public class FileServiceImpl implements FileService {
         MetaDataFile metaDataFile = metaDataFileRepository.findById(id)
                 .orElseThrow(() -> new FileNotFoundException("File not found with id: " + id));
 
-        FileDto fileDto = new FileDto();
-        fileDto.setId(metaDataFile.getId().toString());
-        fileDto.setName(metaDataFile.getName());
-        fileDto.setSize(metaDataFile.getSize());
-        fileDto.setUploadTime(metaDataFile.getUploadTime());
-
-        return fileDto;
+        return FileMapper.metaToFileDto(metaDataFile);
     }
 
     @Override
+    public void deleteFile(UUID id, UserDto user) {
+        try {
+            MetaDataFile metaDataFile = metaDataFileRepository.findById(id)
+                    .orElseThrow(() -> new FileNotFoundException("File not found with id: " + id));
+
+            if (!metaDataFile.getUserId().equals(user.id())
+                    && !user.role().equals(Role.ADMIN)
+                    && !user.role().equals(Role.MODERATOR)
+            ) {
+                throw new AccessNotAllowedException("You do not have permission to delete this file");
+            }
+
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(id.toString())
+                            .build());
+
+            metaDataFileRepository.delete(metaDataFile);
+        } catch (Exception e) {
+            throw new LoadFileException("Error deleting file", e);
+        }
+    }
+
+
+    @Override
     public List<FileDto> getAllFiles() {
-        return metaDataFileRepository.findAll().stream().map(file -> {
-            FileDto dto = new FileDto();
-            dto.setId(file.getId().toString());
-            dto.setName(file.getName());
-            dto.setSize(file.getSize());
-            dto.setUploadTime(file.getUploadTime());
-            return dto;
-        }).toList();
+        return metaDataFileRepository.findAll().stream().map(FileMapper::metaToFileDto).toList();
     }
 }
 

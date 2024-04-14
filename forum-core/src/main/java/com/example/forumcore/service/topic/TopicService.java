@@ -1,7 +1,7 @@
 package com.example.forumcore.service.topic;
 
+import com.example.common.dto.PageResponse;
 import com.example.common.dto.UserDto;
-import com.example.forumcore.dto.PageResponse;
 import com.example.forumcore.dto.request.topic.TopicRequest;
 import com.example.forumcore.dto.response.TopicResponse;
 import com.example.forumcore.enums.TopicSortType;

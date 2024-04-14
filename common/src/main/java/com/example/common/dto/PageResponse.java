@@ -1,4 +1,4 @@
-package com.example.forumcore.dto;
+package com.example.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

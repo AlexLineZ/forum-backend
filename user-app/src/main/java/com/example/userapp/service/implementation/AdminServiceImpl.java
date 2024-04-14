@@ -1,5 +1,6 @@
 package com.example.userapp.service.implementation;
 
+import com.example.common.dto.PageResponse;
 import com.example.common.dto.UserDto;
 import com.example.common.enums.Role;
 import com.example.common.exception.CustomDuplicateFieldException;
@@ -13,9 +14,12 @@ import com.example.userapp.mapper.UserMapper;
 import com.example.userapp.repository.UserRepository;
 import com.example.userapp.service.AdminService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -118,6 +122,20 @@ public class AdminServiceImpl implements AdminService {
                     return user.getId();
                 })
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
+    }
+
+    @Override
+    public PageResponse<UserDto> findAllUsers(Pageable pageable) {
+        Page<User> page = userRepository.findAll(pageable);
+        List<UserDto> users = page.getContent().stream()
+                .map(UserMapper::mapUserToUserDto)
+                .toList();
+        return new PageResponse<>(
+                users,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements()
+        );
     }
 
 }

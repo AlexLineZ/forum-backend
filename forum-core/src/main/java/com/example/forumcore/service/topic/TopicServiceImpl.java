@@ -1,10 +1,10 @@
 package com.example.forumcore.service.topic;
 
+import com.example.common.dto.PageResponse;
 import com.example.common.dto.UserDto;
 import com.example.common.enums.Role;
 import com.example.common.exception.AccessNotAllowedException;
 import com.example.common.exception.NotFoundException;
-import com.example.forumcore.dto.PageResponse;
 import com.example.forumcore.dto.request.topic.TopicRequest;
 import com.example.forumcore.dto.response.TopicResponse;
 import com.example.forumcore.entity.Category;
@@ -113,8 +113,13 @@ public class TopicServiceImpl implements TopicService {
     private PageResponse<TopicResponse> getTopicResponseCustomPage(Page<Topic> topics) {
         List<TopicResponse> content = topics.getContent().stream()
                 .map(topic -> {
-                    UserDto user = userAppClient.getUserById(topic.getCreatedBy());
-                    String creatorFullName = user.firstName() + " " + user.lastName();
+                    UserDto user = null;
+                    try {
+                        user = userAppClient.getUserById(topic.getCreatedBy());
+                    } catch (Exception e) {
+                        System.err.println("Error fetching user details: " + e.getMessage());
+                    }
+                    String creatorFullName = (user != null) ? user.firstName() + " " + user.lastName() : "Unknown User";
 
                     return new TopicResponse(
                             topic.getId(),

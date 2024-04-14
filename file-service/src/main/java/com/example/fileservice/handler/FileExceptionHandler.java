@@ -1,5 +1,6 @@
 package com.example.fileservice.handler;
 
+import com.example.common.exception.AccessNotAllowedException;
 import com.example.fileservice.exception.LoadFileException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,10 @@ import java.io.FileNotFoundException;
 
 @ControllerAdvice
 public class FileExceptionHandler {
+    @ExceptionHandler(AccessNotAllowedException.class)
+    public ResponseEntity<Object> handleAccessNotAllowedException(AccessNotAllowedException ex) {
+        return new ResponseEntity<>("Error: " + ex.getMessage(), HttpStatus.FORBIDDEN);
+    }
 
     @ExceptionHandler(LoadFileException.class)
     public ResponseEntity<Object> handleLoadFileException(LoadFileException ex) {

@@ -1,15 +1,10 @@
 package com.example.userapp.controller;
 
 import com.example.common.dto.UserDto;
-import com.example.userapp.dto.TokenResponse;
-import com.example.userapp.dto.request.user.LoginRequest;
-import com.example.userapp.dto.request.user.RegisterRequest;
 import com.example.userapp.dto.request.user.UserUpdateRequest;
 import com.example.userapp.dto.response.UserResponse;
-import com.example.userapp.entity.User;
-import com.example.userapp.service.implementation.UserService;
+import com.example.userapp.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

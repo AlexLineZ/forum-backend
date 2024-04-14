@@ -52,7 +52,7 @@ public class TokenServiceImpl implements TokenService {
         User user = userRepository.findById(userId).orElseThrow(()
                 -> new UserNotFoundException("Invalid login details"));
 
-        return getTokens(UserMapper.userToUserDto(user));
+        return getTokens(UserMapper.mapUserToUserDto(user));
     }
 
     private void deleteRefreshToken(UUID tokenId){

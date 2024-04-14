@@ -93,8 +93,13 @@ public class CategoryServiceImpl implements CategoryService {
         List<Category> categories = categoryRepository.findByNameContainingIgnoreCase(name);
         return categories.stream()
                 .map(category -> {
-                    UserDto user = userAppClient.getUserById(category.getCreatedBy());
-                    String fullName = user.firstName() + " " + user.lastName();
+                    UserDto user = null;
+                    try {
+                        user = userAppClient.getUserById(category.getCreatedBy());
+                    } catch (Exception e) {
+                        System.err.println("Error fetching user details: " + e.getMessage());
+                    }
+                    String creatorFullName = (user != null) ? user.firstName() + " " + user.lastName() : "Unknown User";
 
                     return new CategoryResponse(
                             category.getId(),
@@ -102,7 +107,7 @@ public class CategoryServiceImpl implements CategoryService {
                             category.getCreatedAt(),
                             category.getModifiedAt(),
                             category.getCreatedBy(),
-                            fullName,
+                            creatorFullName,
                             Optional.ofNullable(category.getParentCategory()).map(Category::getId),
                             Collections.emptyList()
                     );
@@ -116,8 +121,13 @@ public class CategoryServiceImpl implements CategoryService {
             if ((parentId == null && category.getParentCategory() == null) ||
                     (category.getParentCategory() != null && Objects.equals(parentId, category.getParentCategory().getId()))) {
                 List<CategoryResponse> childCategories = buildHierarchy(categories, category.getId(), sortType);
-                UserDto user = userAppClient.getUserById(category.getCreatedBy());
-                String fullName = user.firstName() + " " + user.lastName();
+                UserDto user = null;
+                try {
+                    user = userAppClient.getUserById(category.getCreatedBy());
+                } catch (Exception e) {
+                    System.err.println("Error fetching user details: " + e.getMessage());
+                }
+                String creatorFullName = (user != null) ? user.firstName() + " " + user.lastName() : "Unknown User";
 
                 CategoryResponse categoryResponse = new CategoryResponse(
                         category.getId(),
@@ -125,7 +135,7 @@ public class CategoryServiceImpl implements CategoryService {
                         category.getCreatedAt(),
                         category.getModifiedAt(),
                         category.getCreatedBy(),
-                        fullName,
+                        creatorFullName,
                         Optional.ofNullable(category.getParentCategory()).map(Category::getId),
                         childCategories
                 );

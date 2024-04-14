@@ -17,18 +17,18 @@ import com.example.userapp.repository.ConfirmationTokenRepository;
 import com.example.userapp.repository.UserRepository;
 import com.example.userapp.service.EmailService;
 import com.example.userapp.service.TokenService;
+import com.example.userapp.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final ConfirmationTokenRepository confirmationTokenRepository;
@@ -54,7 +54,7 @@ public class UserService implements UserDetailsService {
 
         emailService.sendMessageToEmail(user.getEmail(), confirmationToken.getConfirmationToken());
 
-        return tokenService.getTokens(UserMapper.userToUserDto(newUser));
+        return tokenService.getTokens(UserMapper.mapUserToUserDto(newUser));
     }
 
     public TokenResponse loginUser(LoginRequest body){
@@ -65,7 +65,7 @@ public class UserService implements UserDetailsService {
             throw new UserNotFoundException("Invalid login details");
         }
 
-        return tokenService.getTokens(UserMapper.userToUserDto(user));
+        return tokenService.getTokens(UserMapper.mapUserToUserDto(user));
     }
 
     public UserResponse updateUser(UserDto currentUser, UserUpdateRequest updateRequest){
@@ -74,7 +74,13 @@ public class UserService implements UserDetailsService {
 
         if (updateRequest.getFirstName() != null) user.setFirstName(updateRequest.getFirstName());
         if (updateRequest.getLastName() != null) user.setLastName(updateRequest.getLastName());
-        if (updateRequest.getPhone() != null) user.setPhone(updateRequest.getPhone());
+        if (updateRequest.getPhone() != null) {
+            Optional<User> existingUserWithPhone = userRepository.findByPhone(updateRequest.getPhone());
+            if (existingUserWithPhone.isPresent() && !existingUserWithPhone.get().getId().equals(user.getId())) {
+                throw new CustomDuplicateFieldException("Phone already exists");
+            }
+            user.setPhone(updateRequest.getPhone());
+        }
         if (updateRequest.getPassword() != null) user.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
 
         User updatedUser = userRepository.save(user);
@@ -96,7 +102,7 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with ID: " + userId + " not found"));
 
-        return UserMapper.userToUserDto(user);
+        return UserMapper.mapUserToUserDto(user);
     }
 
     public void confirmEmail(UUID confirmationToken) {
@@ -110,11 +116,5 @@ public class UserService implements UserDetailsService {
         } else {
             throw new CouldNotVerifyEmailException("Couldn't verify email");
         }
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));
     }
 }
