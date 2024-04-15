@@ -15,7 +15,9 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -30,6 +32,13 @@ public class TokenServiceImpl implements TokenService {
 
     @Value("${jwt.refresh.expiration}")
     private Duration lifetime;
+
+    @Scheduled(fixedRate = 86400000)
+    @Transactional
+    public void cleanupExpiredTokens() {
+        Instant now = Instant.now();
+        refreshRepository.deleteAllByExpirationDateTimeBefore(now);
+    }
 
     @Override
     public TokenResponse getTokens(UserDto user){

@@ -10,11 +10,13 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableAsync
 @EnableFeignClients(basePackages = "com.example.security.client")
+@EnableScheduling
 @Import({SecurityConfig.class, JwtRequestFilter.class, JwtTokenUtils.class})
 public class UserAppApplication {
 
