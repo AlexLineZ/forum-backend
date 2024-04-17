@@ -64,10 +64,6 @@ public class TokenServiceImpl implements TokenService {
         return getTokens(UserMapper.mapUserToUserDto(user));
     }
 
-    private void deleteRefreshToken(UUID tokenId){
-        refreshRepository.deleteById(tokenId);
-    }
-
     private boolean isRefreshTokenValid(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(jwtTokenUtils.getSignKey()).build().parseClaimsJws(token);
