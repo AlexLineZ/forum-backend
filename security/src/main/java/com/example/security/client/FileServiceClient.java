@@ -17,6 +17,6 @@ public interface FileServiceClient {
     @GetMapping("/api/files/info")
     FileDto getFileInfo(@RequestParam("id") UUID id);
 
-    @DeleteMapping("/api/files//delete/{id}")
+    @DeleteMapping("/api/files/delete/{id}")
     void deleteFile(@PathVariable UUID id, UserDto user);
 }

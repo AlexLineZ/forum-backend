@@ -41,7 +41,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         String requestPath = request.getRequestURI();
 
-        if (allowedPaths.contains(requestPath)) {
+        boolean isPathAllowed = allowedPaths.stream().anyMatch(requestPath::contains);
+
+        if (isPathAllowed) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -53,7 +55,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             try {
                 UUID userId = jwtTokenUtils.getUserIdFromToken(jwt);
                 if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDto user = userAppClient.getUserById(userId);
+
+                    UserDto user = null;
+                    try {
+                        user = userAppClient.getUserById(userId);
+                    } catch (Exception ignored){
+                    }
 
                     if (user != null && user.isEnabled() && !user.isBlocked()) {
                         List<GrantedAuthority> authorities = Collections.singletonList(
@@ -64,10 +71,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         );
                         SecurityContextHolder.getContext().setAuthentication(token);
                     } else if (user != null && user.isBlocked()) {
-                        denyAccess(response, "Account is blocked.");
+                        denyAccess(response, "Account is blocked");
                         return;
-                    } else {
-                        denyAccess(response, "Account is not activated.");
+                    } else if (user != null){
+                        denyAccess(response, "Account is not activated");
                         return;
                     }
                 }

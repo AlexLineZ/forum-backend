@@ -40,6 +40,7 @@ public class MessageServiceImpl implements MessageService{
     private final TopicRepository topicRepository;
     private final MessageRepository messageRepository;
     private final AttachmentRepository attachmentRepository;
+
     private final FileServiceClient fileServiceClient;
 
     @Override
@@ -61,7 +62,7 @@ public class MessageServiceImpl implements MessageService{
             Set<UUID> uniqueFileIds = new HashSet<>(request.getFilesIds());
 
             List<Attachment> attachments = uniqueFileIds.stream()
-                    .map(fileId -> createAttachmentForMessage(fileId, message))
+                    .map(fileId -> createAttachmentForMessage(fileId, message, user.id()))
                     .toList();
 
             attachmentRepository.saveAll(attachments);
@@ -167,21 +168,10 @@ public class MessageServiceImpl implements MessageService{
                 .orElseThrow(() -> new NotFoundException("Message with ID " + messageId + " not found"));
 
         if (!message.getCreatedBy().equals(user.id())) {
-            throw new AccessNotAllowedException("Only the author of the message can add attachments.");
+            throw new AccessNotAllowedException("Only the author of the message can add attachments");
         }
 
-        FileDto fileDto;
-        try {
-            fileDto = fileServiceClient.getFileInfo(fileId);
-        } catch (FeignException e) {
-            if (e.status() == 404) {
-                throw new NotFoundException("File with ID " + fileId + " not found");
-            } else {
-                throw new IllegalArgumentException("Error communicating with file service", e);
-            }
-        }
-
-        Attachment attachment = createAttachment(fileDto, message);
+        Attachment attachment = createAttachmentForMessage(fileId, message, user.id());
         attachmentRepository.save(attachment);
     }
 
@@ -226,7 +216,7 @@ public class MessageServiceImpl implements MessageService{
         }
     }
 
-    private Attachment createAttachmentForMessage(UUID fileId, Message message){
+    private Attachment createAttachmentForMessage(UUID fileId, Message message, UUID currentUserId){
         FileDto fileDto;
         try {
             fileDto = fileServiceClient.getFileInfo(fileId);
@@ -236,6 +226,10 @@ public class MessageServiceImpl implements MessageService{
             } else {
                 throw new IllegalArgumentException("Error communicating with file service", e);
             }
+        }
+
+        if (!currentUserId.equals(fileDto.getAuthorId())){
+            throw new AccessNotAllowedException("Only the author of the file can add it to attachment");
         }
 
         return createAttachment(fileDto, message);
