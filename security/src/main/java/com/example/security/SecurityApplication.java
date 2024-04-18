@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
-@EnableFeignClients(basePackages = "com.example.common.client")
+@EnableFeignClients(basePackages = "com.example.security.client")
 public class SecurityApplication {
 
     public static void main(String[] args) {
