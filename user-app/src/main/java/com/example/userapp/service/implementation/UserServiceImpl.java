@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -36,6 +37,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
 
+    @Override
+    @Transactional
     public TokenResponse registerUser(RegisterRequest body) {
         User user = UserMapper.mapRegisterBodyToUser(body);
         if (userRepository.existsByEmail(user.getEmail())) {
@@ -57,6 +60,7 @@ public class UserServiceImpl implements UserService {
         return tokenService.getTokens(UserMapper.mapUserToUserDto(newUser));
     }
 
+    @Override
     public TokenResponse loginUser(LoginRequest body){
         User user = userRepository.findByEmail(body.email())
                 .orElseThrow(() -> new UserNotFoundException("Invalid login details"));
@@ -68,6 +72,8 @@ public class UserServiceImpl implements UserService {
         return tokenService.getTokens(UserMapper.mapUserToUserDto(user));
     }
 
+    @Override
+    @Transactional
     public UserResponse updateUser(UserDto currentUser, UserUpdateRequest updateRequest){
         User user = userRepository.findById(currentUser.id())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
@@ -88,16 +94,19 @@ public class UserServiceImpl implements UserService {
         return UserMapper.mapUserToResponse(updatedUser);
     }
 
+    @Override
     public UserResponse getUserByDto(UserDto userDto) {
         User user = getUserByAuthentication(userDto);
         return UserMapper.mapUserToResponse(user);
     }
 
+    @Override
     public User getUserByAuthentication(UserDto userDto) {
         return userRepository.findById(userDto.id())
                 .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + userDto.id() + " not found"));
     }
 
+    @Override
     public UserDto getUserByUserId(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with ID: " + userId + " not found"));
@@ -105,6 +114,8 @@ public class UserServiceImpl implements UserService {
         return UserMapper.mapUserToUserDto(user);
     }
 
+    @Override
+    @Transactional
     public void confirmEmail(UUID confirmationToken) {
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
 

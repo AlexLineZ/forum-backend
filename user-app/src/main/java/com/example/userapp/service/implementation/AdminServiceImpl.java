@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +30,7 @@ public class AdminServiceImpl implements AdminService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional
     public UUID createUser(AdminRegisterRequest request) {
         User newUser = UserMapper.mapAdminRegisterToUser(request);
         if (userRepository.existsByEmail(newUser.getEmail())) {
@@ -43,6 +45,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public UUID updateUser(UUID id, AdminUpdateRequest request) {
         return userRepository.findById(id)
                 .map(user -> {
@@ -60,6 +63,7 @@ public class AdminServiceImpl implements AdminService {
 
 
     @Override
+    @Transactional
     public UUID blockUser(UUID id, UserDto admin) {
         UUID adminId = admin.id();
         if (id.equals(adminId)) {
@@ -82,6 +86,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public UUID unblockUser(UUID id, UserDto admin) {
         UUID adminId = admin.id();
         if (id.equals(adminId)) {
@@ -104,6 +109,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public UUID updateUserRole(UUID id, Role newRole, UserDto admin) {
         UUID adminId = admin.id();
         return userRepository.findById(id)
