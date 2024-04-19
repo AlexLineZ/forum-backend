@@ -8,6 +8,7 @@ import com.example.userapp.dto.request.admin.AdminUpdateRequest;
 import com.example.userapp.service.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class AdminController {
             description = "Позволяет администратору создать пользователя"
     )
     public ResponseEntity<UUID> createUser(
-            @RequestBody AdminRegisterRequest user
+            @Valid @RequestBody AdminRegisterRequest user
     ) {
         return ResponseEntity.ok(adminService.createUser(user));
     }
@@ -41,7 +42,7 @@ public class AdminController {
     )
     public ResponseEntity<UUID> updateUser(
             @PathVariable UUID id,
-            @RequestBody AdminUpdateRequest user
+            @Valid @RequestBody AdminUpdateRequest user
     ) {
         return ResponseEntity.ok(adminService.updateUser(id, user));
     }

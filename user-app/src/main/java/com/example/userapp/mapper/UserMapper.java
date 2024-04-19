@@ -48,12 +48,12 @@ public class UserMapper {
 
     public static User mapAdminRegisterToUser(AdminRegisterRequest request) {
         User user = new User();
-        user.setPhone(request.phone());
-        user.setPassword(request.password());
-        user.setFirstName(request.firstName());
-        user.setLastName(request.lastName());
-        user.setEmail(request.email());
-        user.setRole(request.role());
+        user.setPhone(request.getPhone());
+        user.setPassword(request.getPassword());
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setRole(request.getRole());
         user.setEnabled(true);
         user.setBlocked(false);
         return user;

@@ -39,7 +39,7 @@ public class AdminServiceImpl implements AdminService {
         if (userRepository.existsByPhone(newUser.getPhone())) {
             throw new CustomDuplicateFieldException("Phone already exists");
         }
-        newUser.setPassword(passwordEncoder.encode(request.password()));
+        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(newUser);
         return newUser.getId();
     }
@@ -49,12 +49,12 @@ public class AdminServiceImpl implements AdminService {
     public UUID updateUser(UUID id, AdminUpdateRequest request) {
         return userRepository.findById(id)
                 .map(user -> {
-                    if (user.getRole().equals(Role.ADMIN) && request.role() != null && request.role().equals(Role.ADMIN)) {
+                    if (user.getRole().equals(Role.ADMIN) && request.getRole() != null) {
                         throw new AdminActionNotAllowedException("Admin cannot change the role of another admin");
                     }
-                    if (request.firstName() != null) user.setFirstName(request.firstName());
-                    if (request.lastName() != null) user.setLastName(request.lastName());
-                    if (request.role() != null) user.setRole(request.role());
+                    if (request.getFirstName() != null) user.setFirstName(request.getFirstName());
+                    if (request.getLastName() != null) user.setLastName(request.getLastName());
+                    if (request.getRole() != null) user.setRole(request.getRole() );
                     userRepository.save(user);
                     return user.getId();
                 })
