@@ -8,9 +8,11 @@ import com.example.common.exception.NotFoundException;
 import com.example.forumcore.dto.request.topic.TopicRequest;
 import com.example.forumcore.dto.response.TopicResponse;
 import com.example.forumcore.entity.Category;
+import com.example.forumcore.entity.FavoriteTopic;
 import com.example.forumcore.entity.Topic;
 import com.example.forumcore.enums.TopicSortType;
 import com.example.forumcore.repository.CategoryRepository;
+import com.example.forumcore.repository.FavoriteTopicRepository;
 import com.example.forumcore.repository.MessageRepository;
 import com.example.forumcore.repository.TopicRepository;
 import com.example.security.client.UserAppClient;
@@ -32,6 +34,7 @@ public class TopicServiceImpl implements TopicService {
     private final TopicRepository topicRepository;
     private final CategoryRepository categoryRepository;
     private final MessageRepository messageRepository;
+    private final FavoriteTopicRepository favoriteTopicRepository;
     private final UserAppClient userAppClient;
 
     @Override
@@ -41,7 +44,8 @@ public class TopicServiceImpl implements TopicService {
             throw new IllegalStateException("Category Id must not be null");
         }
         Category category = categoryRepository.findById(topicRequest.getCategoryId())
-                .orElseThrow(() -> new NotFoundException("Category with ID " + topicRequest.getCategoryId() + " not found"));
+                .orElseThrow(() ->
+                        new NotFoundException("Category with ID " + topicRequest.getCategoryId() + " not found"));
 
         boolean hasChildCategories = categoryRepository.existsByParentCategoryId(topicRequest.getCategoryId());
         if (hasChildCategories) {
@@ -69,7 +73,8 @@ public class TopicServiceImpl implements TopicService {
 
         topic.setName(updatedTopic.getName());
         topic.setCategory(categoryRepository.findById(updatedTopic.getCategoryId())
-                .orElseThrow(() -> new NotFoundException("Category with ID " + updatedTopic.getCategoryId() + " not found")));
+                .orElseThrow(() ->
+                        new NotFoundException("Category with ID " + updatedTopic.getCategoryId() + " not found")));
 
         topicRepository.save(topic);
         return id;
@@ -112,26 +117,59 @@ public class TopicServiceImpl implements TopicService {
     @NotNull
     private PageResponse<TopicResponse> getTopicResponseCustomPage(Page<Topic> topics) {
         List<TopicResponse> content = topics.getContent().stream()
-                .map(topic -> {
-                    UserDto user = null;
-                    try {
-                        user = userAppClient.getUserById(topic.getCreatedBy());
-                    } catch (Exception e) {
-                        System.err.println("Error fetching user details: " + e.getMessage());
-                    }
-                    String creatorFullName = (user != null) ? user.firstName() + " " + user.lastName() : "Unknown User";
-
-                    return new TopicResponse(
-                            topic.getId(),
-                            topic.getName(),
-                            topic.getCreatedAt(),
-                            topic.getModifiedAt(),
-                            topic.getCreatedBy(),
-                            creatorFullName,
-                            topic.getCategory().getId()
-                    );
-                })
+                .map(this::convertToTopicResponse)
                 .toList();
         return new PageResponse<>(content, topics.getNumber(), topics.getSize(), topics.getTotalElements());
     }
+
+    @Override
+    @Transactional
+    public void addToFavorites(UUID topicId, UserDto user) {
+        Topic topic = topicRepository.findById(topicId)
+                .orElseThrow(() -> new NotFoundException("Topic with ID " + topicId + " not found"));
+
+        if (!favoriteTopicRepository.existsByUserIdAndTopicId(user.id(), topicId)) {
+            FavoriteTopic favorite = new FavoriteTopic();
+            favorite.setUserId(user.id());
+            favorite.setTopic(topic);
+            favoriteTopicRepository.save(favorite);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void removeFromFavorites(UUID topicId, UserDto user) {
+        if (!topicRepository.existsById(topicId)) {
+            throw new NotFoundException("Topic with ID " + topicId + " not found");
+        }
+
+        favoriteTopicRepository.deleteByUserIdAndTopicId(user.id(), topicId);
+    }
+
+    @Override
+    public List<TopicResponse> getFavoriteTopics(UserDto user) {
+        return favoriteTopicRepository.findByUserId(user.id()).stream()
+                .map(favorite -> convertToTopicResponse(favorite.getTopic()))
+                .toList();
+    }
+
+    private TopicResponse convertToTopicResponse(Topic topic) {
+        UserDto user = null;
+        try {
+            user = userAppClient.getUserById(topic.getCreatedBy());
+        } catch (Exception e) {
+            System.err.println("Error fetching user details: " + e.getMessage());
+        }
+        String creatorFullName = (user != null) ? user.firstName() + " " + user.lastName() : "Unknown User";
+        return new TopicResponse(
+                topic.getId(),
+                topic.getName(),
+                topic.getCreatedAt(),
+                topic.getModifiedAt(),
+                topic.getCreatedBy(),
+                creatorFullName,
+                topic.getCategory().getId()
+        );
+    }
 }
+

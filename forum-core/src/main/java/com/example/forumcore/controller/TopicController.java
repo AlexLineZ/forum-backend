@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -65,5 +66,26 @@ public class TopicController {
                                                                           @RequestParam(defaultValue = "0") int page,
                                                                           @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(topicService.searchTopicsByName(name, page, size));
+    }
+
+    @Operation(summary = "Добавление топика в избранное")
+    @PostMapping("/favorites/{topicId}")
+    public ResponseEntity<Void> addToFavorites(@PathVariable UUID topicId, @AuthenticationPrincipal UserDto user) {
+        topicService.addToFavorites(topicId, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Удаление топика из избранного")
+    @DeleteMapping("/favorites/{topicId}")
+    public ResponseEntity<Void> removeFromFavorites(@PathVariable UUID topicId, @AuthenticationPrincipal UserDto user) {
+        topicService.removeFromFavorites(topicId, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Получение списка избранных топиков пользователя")
+    @GetMapping("/favorites")
+    public ResponseEntity<List<TopicResponse>> getFavoriteTopics(@AuthenticationPrincipal UserDto user) {
+        List<TopicResponse> favoriteTopics = topicService.getFavoriteTopics(user);
+        return ResponseEntity.ok(favoriteTopics);
     }
 }

@@ -6,6 +6,7 @@ import com.example.forumcore.dto.request.topic.TopicRequest;
 import com.example.forumcore.dto.response.TopicResponse;
 import com.example.forumcore.enums.TopicSortType;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface TopicService {
@@ -19,4 +20,10 @@ public interface TopicService {
     PageResponse<TopicResponse> getTopics(int page, int size, TopicSortType sortType);
 
     PageResponse<TopicResponse> searchTopicsByName(String name, int page, int size);
+
+    void addToFavorites(UUID topicId, UserDto user);
+
+    void removeFromFavorites(UUID topicId, UserDto user);
+
+    List<TopicResponse> getFavoriteTopics(UserDto user);
 }

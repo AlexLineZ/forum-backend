@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/files/**").authenticated()
                         .requestMatchers("/api/users/profile").authenticated()
+                        .requestMatchers("/api/forum/topics/favorites").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/forum/categories/**", "/api/forum/topics/**", "/api/forum/messages/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/forum/categories/**", "/api/forum/topics/**", "/api/forum/messages/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/forum/categories/**", "/api/forum/topics/**", "/api/forum/messages/**").authenticated()
