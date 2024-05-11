@@ -1,0 +1,17 @@
+version: '3.9'
+services:
+  db:
+    container_name: notification-db
+    image: postgres:12
+    hostname: notification-db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=notification
+      - POSTGRES_USER=notification
+      - POSTGRES_PASSWORD=notification
+    ports:
+      - "5435:5432"
+
+volumes:
+  db-data:

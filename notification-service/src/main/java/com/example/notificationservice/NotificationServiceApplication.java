@@ -1,4 +1,4 @@
-package com.example.forumcore;
+package com.example.notificationservice;
 
 import com.example.security.config.SecurityConfig;
 import com.example.security.jwt.JwtRequestFilter;
@@ -13,10 +13,10 @@ import org.springframework.context.annotation.Import;
 @EnableDiscoveryClient
 @EnableFeignClients(basePackages = { "com.example.security.client"})
 @Import({SecurityConfig.class, JwtRequestFilter.class, JwtTokenUtils.class})
-public class ForumCoreApplication {
+public class NotificationServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ForumCoreApplication.class, args);
+        SpringApplication.run(NotificationServiceApplication.class, args);
     }
 
 }
