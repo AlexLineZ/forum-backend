@@ -33,10 +33,11 @@ public class NotificationController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "UNREAD_FIRST_DATE_DESC") NotificationSortType sortType,
+            @RequestParam(defaultValue = "") String search,
             @AuthenticationPrincipal UserDto user) {
         Sort sort = sortType.toSort();
         Pageable pageable = PageRequest.of(page, size, sort);
-        return ResponseEntity.ok(notificationService.getNotifications(user.id(), pageable));
+        return ResponseEntity.ok(notificationService.getNotifications(user.id(), search, pageable));
     }
 
     @GetMapping("/unread-count")
@@ -44,7 +45,6 @@ public class NotificationController {
         return ResponseEntity.ok(notificationService.getUnreadNotificationCount(user.id()));
     }
 
-    //оставил этот метод для того, что если нужно прочитать какое-то уведомление, например, когда оно всплыло отдельно
     @PutMapping("/read")
     public ResponseEntity<Void> markAsRead(@RequestBody List<UUID> ids, @AuthenticationPrincipal UserDto user) {
         notificationService.markAsRead(ids);

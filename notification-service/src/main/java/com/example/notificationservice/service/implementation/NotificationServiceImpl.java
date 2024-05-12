@@ -22,18 +22,18 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
 
     @Transactional
-    public PageResponse<NotificationResponse> getNotifications(UUID userId, Pageable pageable) {
-        Page<Notification> notificationsPage = notificationRepository.findByUserId(userId, pageable);
+    public PageResponse<NotificationResponse> getNotifications(UUID userId, String search, Pageable pageable) {
+        Page<Notification> notificationsPage = notificationRepository.findByUserIdAndSearch(userId, search, pageable);
 
         List<Notification> unreadNotifications = notificationsPage.getContent().stream()
                 .filter(notification -> !notification.isRead())
                 .toList();
 
-        markNotificationsAsRead(unreadNotifications);
-
         List<NotificationResponse> responses = notificationsPage.getContent().stream()
                 .map(NotificationMapper::convertToNotificationResponse)
                 .toList();
+
+        markNotificationsAsRead(unreadNotifications);
 
         return new PageResponse<>(
                 responses,
@@ -42,6 +42,7 @@ public class NotificationServiceImpl implements NotificationService {
                 notificationsPage.getTotalElements()
         );
     }
+
 
     private void markNotificationsAsRead(List<Notification> notifications) {
         notifications.forEach(notification -> notification.setRead(true));
