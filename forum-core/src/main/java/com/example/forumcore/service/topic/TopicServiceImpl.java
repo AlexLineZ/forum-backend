@@ -147,10 +147,18 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public List<TopicResponse> getFavoriteTopics(UserDto user) {
-        return favoriteTopicRepository.findByUserId(user.id()).stream()
+    public PageResponse<TopicResponse> getFavoriteTopics(UserDto user, Pageable pageable) {
+        Page<FavoriteTopic> favoritesPage = favoriteTopicRepository.findByUserId(user.id(), pageable);
+        List<TopicResponse> topicResponses = favoritesPage.getContent().stream()
                 .map(favorite -> convertToTopicResponse(favorite.getTopic()))
                 .toList();
+
+        return new PageResponse<>(
+                topicResponses,
+                favoritesPage.getNumber(),
+                favoritesPage.getSize(),
+                favoritesPage.getTotalElements()
+        );
     }
 
     private TopicResponse convertToTopicResponse(Topic topic) {

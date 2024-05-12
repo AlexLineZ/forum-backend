@@ -3,6 +3,7 @@ package com.example.forumcore.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -19,5 +20,8 @@ public class FavoriteTopic {
     @ManyToOne
     @JoinColumn(name = "topic_id")
     private Topic topic;
+
+    @Column(name = "added_at")
+    private LocalDateTime addedAt = LocalDateTime.now();
 }
 

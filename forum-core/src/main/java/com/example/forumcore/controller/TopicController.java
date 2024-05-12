@@ -4,12 +4,17 @@ import com.example.common.dto.PageResponse;
 import com.example.common.dto.UserDto;
 import com.example.forumcore.dto.request.topic.TopicRequest;
 import com.example.forumcore.dto.response.TopicResponse;
+import com.example.forumcore.enums.FavoriteTopicSortType;
 import com.example.forumcore.enums.TopicSortType;
 import com.example.forumcore.service.topic.TopicService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -84,8 +89,14 @@ public class TopicController {
 
     @Operation(summary = "Получение списка избранных топиков пользователя")
     @GetMapping("/favorites")
-    public ResponseEntity<List<TopicResponse>> getFavoriteTopics(@AuthenticationPrincipal UserDto user) {
-        List<TopicResponse> favoriteTopics = topicService.getFavoriteTopics(user);
+    public ResponseEntity<PageResponse<TopicResponse>> getFavoriteTopics(
+            @AuthenticationPrincipal UserDto user,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "ADDED_AT_DESC") FavoriteTopicSortType sortType) {
+        Sort sort = sortType.toSort();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        PageResponse<TopicResponse> favoriteTopics = topicService.getFavoriteTopics(user, pageable);
         return ResponseEntity.ok(favoriteTopics);
     }
 }

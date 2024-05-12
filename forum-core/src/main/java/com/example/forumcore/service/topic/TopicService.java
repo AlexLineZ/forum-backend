@@ -5,6 +5,7 @@ import com.example.common.dto.UserDto;
 import com.example.forumcore.dto.request.topic.TopicRequest;
 import com.example.forumcore.dto.response.TopicResponse;
 import com.example.forumcore.enums.TopicSortType;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,5 +26,5 @@ public interface TopicService {
 
     void removeFromFavorites(UUID topicId, UserDto user);
 
-    List<TopicResponse> getFavoriteTopics(UserDto user);
+    PageResponse<TopicResponse> getFavoriteTopics(UserDto user, Pageable pageable);
 }
