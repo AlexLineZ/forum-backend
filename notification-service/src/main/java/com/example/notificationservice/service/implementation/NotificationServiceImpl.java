@@ -1,12 +1,15 @@
 package com.example.notificationservice.service.implementation;
 
 import com.example.common.dto.PageResponse;
+import com.example.notificationservice.dto.NotificationCountResponse;
+import com.example.notificationservice.dto.NotificationResponse;
 import com.example.notificationservice.entity.Notification;
+import com.example.notificationservice.mapper.NotificationMapper;
 import com.example.notificationservice.repository.NotificationRepository;
 import com.example.notificationservice.service.NotificationService;
+import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +21,37 @@ import java.util.UUID;
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
 
-    @Transactional(readOnly = true)
-    public PageResponse<Notification> getNotifications(UUID userId, Pageable pageable) {
-        return convertToPageResponse(notificationRepository.findByUserId(userId, pageable));
+    @Transactional
+    public PageResponse<NotificationResponse> getNotifications(UUID userId, Pageable pageable) {
+        Page<Notification> notificationsPage = notificationRepository.findByUserId(userId, pageable);
+
+        List<Notification> unreadNotifications = notificationsPage.getContent().stream()
+                .filter(notification -> !notification.isRead())
+                .toList();
+
+        markNotificationsAsRead(unreadNotifications);
+
+        List<NotificationResponse> responses = notificationsPage.getContent().stream()
+                .map(NotificationMapper::convertToNotificationResponse)
+                .toList();
+
+        return new PageResponse<>(
+                responses,
+                notificationsPage.getNumber(),
+                notificationsPage.getSize(),
+                notificationsPage.getTotalElements()
+        );
+    }
+
+    private void markNotificationsAsRead(List<Notification> notifications) {
+        notifications.forEach(notification -> notification.setRead(true));
+        notificationRepository.saveAll(notifications);
     }
 
     @Transactional(readOnly = true)
-    public long getUnreadNotificationCount(UUID userId) {
-        return notificationRepository.countByUserIdAndRead(userId, false);
+    public NotificationCountResponse getUnreadNotificationCount(UUID userId) {
+        long count = notificationRepository.countByUserIdAndRead(userId, false);
+        return new NotificationCountResponse(count);
     }
 
     @Transactional
@@ -34,8 +60,5 @@ public class NotificationServiceImpl implements NotificationService {
         notifications.forEach(notification -> notification.setRead(true));
         notificationRepository.saveAll(notifications);
     }
-
-    private PageResponse<Notification> convertToPageResponse(Page<Notification> page) {
-        return new PageResponse<>(page.getContent(), page.getNumber(), page.getSize(), page.getTotalElements());
-    }
 }
+

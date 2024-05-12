@@ -2,6 +2,8 @@ package com.example.notificationservice.controller;
 
 import com.example.common.dto.PageResponse;
 import com.example.common.dto.UserDto;
+import com.example.notificationservice.dto.NotificationCountResponse;
+import com.example.notificationservice.dto.NotificationResponse;
 import com.example.notificationservice.entity.Notification;
 import com.example.notificationservice.enums.NotificationSortType;
 import com.example.notificationservice.service.NotificationService;
@@ -27,7 +29,7 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping
-    public ResponseEntity<PageResponse<Notification>> getNotifications(
+    public ResponseEntity<PageResponse<NotificationResponse>> getNotifications(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "UNREAD_FIRST_DATE_DESC") NotificationSortType sortType,
@@ -38,10 +40,11 @@ public class NotificationController {
     }
 
     @GetMapping("/unread-count")
-    public ResponseEntity<Long> getUnreadNotificationCount(@AuthenticationPrincipal UserDto user) {
+    public ResponseEntity<NotificationCountResponse> getUnreadNotificationCount(@AuthenticationPrincipal UserDto user) {
         return ResponseEntity.ok(notificationService.getUnreadNotificationCount(user.id()));
     }
 
+    //оставил этот метод для того, что если нужно прочитать какое-то уведомление, например, когда оно всплыло отдельно
     @PutMapping("/read")
     public ResponseEntity<Void> markAsRead(@RequestBody List<UUID> ids, @AuthenticationPrincipal UserDto user) {
         notificationService.markAsRead(ids);
