@@ -47,7 +47,7 @@ public class NotificationController {
 
     @PutMapping("/read")
     public ResponseEntity<Void> markAsRead(@RequestBody List<UUID> ids, @AuthenticationPrincipal UserDto user) {
-        notificationService.markAsRead(ids);
+        notificationService.markAsRead(ids, user.id());
         return ResponseEntity.ok().build();
     }
 }

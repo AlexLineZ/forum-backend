@@ -1,6 +1,7 @@
 package com.example.notificationservice.service.implementation;
 
 import com.example.common.dto.PageResponse;
+import com.example.common.exception.AccessNotAllowedException;
 import com.example.notificationservice.dto.NotificationCountResponse;
 import com.example.notificationservice.dto.NotificationResponse;
 import com.example.notificationservice.entity.Notification;
@@ -56,10 +57,18 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Transactional
-    public void markAsRead(List<UUID> ids) {
+    public void markAsRead(List<UUID> ids, UUID userId) {
         List<Notification> notifications = notificationRepository.findAllById(ids);
+        boolean hasUnauthorizedAccess = notifications.stream()
+                .anyMatch(notification -> !notification.getUserId().equals(userId));
+
+        if (hasUnauthorizedAccess) {
+            throw new AccessNotAllowedException("You can only mark your own notifications as read");
+        }
+
         notifications.forEach(notification -> notification.setRead(true));
         notificationRepository.saveAll(notifications);
     }
+
 }
 

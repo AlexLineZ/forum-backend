@@ -13,5 +13,5 @@ import java.util.UUID;
 public interface NotificationService {
     PageResponse<NotificationResponse> getNotifications(UUID userId, String search, Pageable pageable);
     NotificationCountResponse getUnreadNotificationCount(UUID userId);
-    void markAsRead(List<UUID> ids);
+    void markAsRead(List<UUID> ids, UUID userId);
 }
