@@ -20,7 +20,7 @@ public class NotificationMapper {
 
     public static Notification mapMessageToNotification(NotificationMessage message) {
         Notification notification = new Notification();
-        notification.setUserId(UUID.fromString(message.getUserId()));
+        notification.setUserId(message.getUserId());
         notification.setLabel(message.getTitle());
         notification.setMessage(message.getMessage());
         notification.setDate(LocalDateTime.now());

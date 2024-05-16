@@ -3,6 +3,7 @@ package com.example.forumcore.service.message;
 import com.example.common.dto.FileDto;
 import com.example.common.dto.PageResponse;
 import com.example.common.dto.UserDto;
+import com.example.common.enums.NotificationChannel;
 import com.example.common.enums.Role;
 import com.example.common.exception.AccessNotAllowedException;
 import com.example.common.exception.NotFoundException;
@@ -11,9 +12,12 @@ import com.example.forumcore.dto.request.message.MessageUpdateRequest;
 import com.example.forumcore.dto.response.MessageResponse;
 import com.example.forumcore.entity.Attachment;
 import com.example.forumcore.entity.Message;
+import com.example.forumcore.entity.Topic;
 import com.example.forumcore.enums.MessageSortType;
+import com.example.forumcore.kafka.KafkaProducer;
 import com.example.forumcore.mapper.MessageMapper;
 import com.example.forumcore.repository.AttachmentRepository;
+import com.example.forumcore.repository.FavoriteTopicRepository;
 import com.example.forumcore.repository.MessageRepository;
 import com.example.forumcore.repository.TopicRepository;
 import com.example.security.client.FileServiceClient;
@@ -40,7 +44,8 @@ public class MessageServiceImpl implements MessageService{
     private final TopicRepository topicRepository;
     private final MessageRepository messageRepository;
     private final AttachmentRepository attachmentRepository;
-
+    private final FavoriteTopicRepository favoriteTopicRepository;
+    private final KafkaProducer kafkaProducer;
     private final FileServiceClient fileServiceClient;
 
     @Override
@@ -50,11 +55,13 @@ public class MessageServiceImpl implements MessageService{
             throw new IllegalStateException("Topic ID must not be null");
         }
 
+        Topic currentTopic = topicRepository.findById(toUUID(request.getTopicId()))
+                .orElseThrow(() -> new NotFoundException("Topic with ID " + request.getTopicId() + " not found"));
+
         Message message = new Message();
         message.setText(request.getText());
         message.setAuthor(user.firstName() + " " + user.lastName());
-        message.setTopic(topicRepository.findById(toUUID(request.getTopicId()))
-                .orElseThrow(() -> new NotFoundException("Topic with ID " + request.getTopicId() + " not found")));
+        message.setTopic(currentTopic);
         message.setCreatedBy(user.id());
 
 
@@ -66,6 +73,19 @@ public class MessageServiceImpl implements MessageService{
                     .toList();
 
             attachmentRepository.saveAll(attachments);
+        }
+
+        List<UUID> userIdsWithFavoriteTopic = favoriteTopicRepository.findUserIdsByTopicId(toUUID(request.getTopicId()));
+        userIdsWithFavoriteTopic.remove(user.id());
+
+        for (UUID userId : userIdsWithFavoriteTopic) {
+            kafkaProducer.sendMessage(
+                    userId,
+                    "Новый пост в вашем избранном топике: " + currentTopic.getName(),
+                    request.getText(),
+                    List.of(NotificationChannel.EMAIL),
+                    true
+            );
         }
 
         messageRepository.save(message);
