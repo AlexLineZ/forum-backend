@@ -1,6 +1,7 @@
 package com.example.userapp.mapper;
 
-import com.example.common.dto.UserDto;
+import com.example.common.dto.UserNotification;
+import com.example.common.dto.user.UserDto;
 import com.example.userapp.dto.request.admin.AdminRegisterRequest;
 import com.example.userapp.dto.request.user.RegisterRequest;
 import com.example.userapp.dto.response.UserResponse;
@@ -57,5 +58,9 @@ public class UserMapper {
         user.setEnabled(true);
         user.setBlocked(false);
         return user;
+    }
+
+    public static UserNotification mapUserToUserNotification(User user){
+        return new UserNotification(user.getId(), user.getEmail(), user.getFirstName() + " " + user.getLastName());
     }
 }

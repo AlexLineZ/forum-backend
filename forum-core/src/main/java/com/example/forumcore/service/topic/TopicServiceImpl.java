@@ -1,7 +1,7 @@
 package com.example.forumcore.service.topic;
 
-import com.example.common.dto.PageResponse;
-import com.example.common.dto.UserDto;
+import com.example.common.dto.page.PageResponse;
+import com.example.common.dto.user.UserDto;
 import com.example.common.enums.Role;
 import com.example.common.exception.AccessNotAllowedException;
 import com.example.common.exception.NotFoundException;

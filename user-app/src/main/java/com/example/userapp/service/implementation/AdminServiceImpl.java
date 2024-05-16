@@ -1,7 +1,8 @@
 package com.example.userapp.service.implementation;
 
-import com.example.common.dto.PageResponse;
-import com.example.common.dto.UserDto;
+import com.example.common.dto.page.PageResponse;
+import com.example.common.dto.user.UserDto;
+import com.example.common.enums.NotificationChannel;
 import com.example.common.enums.Role;
 import com.example.common.exception.CustomDuplicateFieldException;
 import com.example.common.exception.UserNotFoundException;
@@ -10,6 +11,7 @@ import com.example.userapp.dto.request.admin.AdminUpdateRequest;
 import com.example.userapp.entity.User;
 import com.example.userapp.exception.InvalidActionException;
 import com.example.userapp.exception.AdminActionNotAllowedException;
+import com.example.userapp.kafka.KafkaProducer;
 import com.example.userapp.mapper.UserMapper;
 import com.example.userapp.repository.UserRepository;
 import com.example.userapp.service.AdminService;
@@ -28,6 +30,7 @@ import java.util.UUID;
 public class AdminServiceImpl implements AdminService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final KafkaProducer kafkaProducer;
 
     @Override
     @Transactional
@@ -49,12 +52,8 @@ public class AdminServiceImpl implements AdminService {
     public UUID updateUser(UUID id, AdminUpdateRequest request) {
         return userRepository.findById(id)
                 .map(user -> {
-                    if (user.getRole().equals(Role.ADMIN) && request.getRole() != null) {
-                        throw new AdminActionNotAllowedException("Admin cannot change the role of another admin");
-                    }
                     if (request.getFirstName() != null) user.setFirstName(request.getFirstName());
                     if (request.getLastName() != null) user.setLastName(request.getLastName());
-                    if (request.getRole() != null) user.setRole(request.getRole() );
                     userRepository.save(user);
                     return user.getId();
                 })
@@ -80,6 +79,15 @@ public class AdminServiceImpl implements AdminService {
                     }
                     user.setBlocked(true);
                     userRepository.save(user);
+
+                    kafkaProducer.sendMessage(
+                            UserMapper.mapUserToUserNotification(user),
+                            "Ваш аккаунт заблокирован",
+                            "Ваш аккаунт был заблокирован администратором, значит вы вели себя неподобающе :(",
+                            List.of(NotificationChannel.EMAIL),
+                            true
+                    );
+
                     return user.getId();
                 })
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
@@ -103,6 +111,15 @@ public class AdminServiceImpl implements AdminService {
                     }
                     user.setBlocked(false);
                     userRepository.save(user);
+
+                    kafkaProducer.sendMessage(
+                            UserMapper.mapUserToUserNotification(user),
+                            "Ваш аккаунт разблокирован",
+                            "Вы убедили администратора Вас разблокировать, поздравляем!",
+                            List.of(NotificationChannel.EMAIL),
+                            true
+                    );
+
                     return user.getId();
                 })
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
@@ -125,6 +142,15 @@ public class AdminServiceImpl implements AdminService {
                     }
                     user.setRole(newRole);
                     userRepository.save(user);
+
+                    kafkaProducer.sendMessage(
+                            UserMapper.mapUserToUserNotification(user),
+                            "Ваша роль на форуме была изменена",
+                            "Вам была выдана роль: " + newRole.name(),
+                            List.of(NotificationChannel.EMAIL),
+                            true
+                    );
+
                     return user.getId();
                 })
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));

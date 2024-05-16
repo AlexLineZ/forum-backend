@@ -1,7 +1,7 @@
 package com.example.notificationservice.controller;
 
-import com.example.common.dto.PageResponse;
-import com.example.common.dto.UserDto;
+import com.example.common.dto.page.PageResponse;
+import com.example.common.dto.user.UserDto;
 import com.example.notificationservice.dto.response.NotificationCountResponse;
 import com.example.notificationservice.dto.response.NotificationResponse;
 import com.example.notificationservice.enums.NotificationSortType;

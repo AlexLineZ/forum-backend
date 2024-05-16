@@ -1,7 +1,7 @@
 package com.example.notificationservice.service;
 
-import com.example.common.dto.NotificationMessage;
+import com.example.common.dto.NotificationUserMessage;
 
 public interface KafkaMessageService {
-    void processNotification(NotificationMessage message);
+    void processNotification(NotificationUserMessage message);
 }

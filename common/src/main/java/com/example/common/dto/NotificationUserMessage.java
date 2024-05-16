@@ -7,25 +7,24 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
-public class NotificationMessage {
-    private final UUID userId;
+public class NotificationUserMessage {
+    private final UserNotification user;
     private final String title;
     private final String message;
     private final boolean displayInHistory;
     private final List<NotificationChannel> deliveryChannels;
 
     @JsonCreator
-    public NotificationMessage(
-            @JsonProperty("userId") UUID userId,
+    public NotificationUserMessage(
+            @JsonProperty("user") UserNotification user,
             @JsonProperty("title") String title,
             @JsonProperty("message") String message,
             @JsonProperty("displayInHistory") boolean displayInHistory,
             @JsonProperty("deliveryChannels") List<NotificationChannel> deliveryChannels) {
-        this.userId = userId;
+        this.user = user;
         this.title = title;
         this.message = message;
         this.displayInHistory = displayInHistory;

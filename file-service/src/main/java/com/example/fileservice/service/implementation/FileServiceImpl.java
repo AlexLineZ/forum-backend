@@ -1,7 +1,7 @@
 package com.example.fileservice.service.implementation;
 
-import com.example.common.dto.FileDto;
-import com.example.common.dto.UserDto;
+import com.example.common.dto.file.FileDto;
+import com.example.common.dto.user.UserDto;
 import com.example.common.enums.Role;
 import com.example.common.exception.AccessNotAllowedException;
 import com.example.fileservice.entity.MetaDataFile;
@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 

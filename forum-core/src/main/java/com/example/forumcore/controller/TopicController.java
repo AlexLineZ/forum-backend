@@ -1,7 +1,7 @@
 package com.example.forumcore.controller;
 
-import com.example.common.dto.PageResponse;
-import com.example.common.dto.UserDto;
+import com.example.common.dto.page.PageResponse;
+import com.example.common.dto.user.UserDto;
 import com.example.forumcore.dto.request.topic.TopicRequest;
 import com.example.forumcore.dto.response.TopicResponse;
 import com.example.forumcore.enums.FavoriteTopicSortType;
@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -19,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController

@@ -1,8 +1,8 @@
 package com.example.forumcore.service.message;
 
-import com.example.common.dto.FileDto;
-import com.example.common.dto.PageResponse;
-import com.example.common.dto.UserDto;
+import com.example.common.dto.file.FileDto;
+import com.example.common.dto.page.PageResponse;
+import com.example.common.dto.user.UserDto;
 import com.example.common.enums.NotificationChannel;
 import com.example.common.enums.Role;
 import com.example.common.exception.AccessNotAllowedException;
@@ -45,6 +45,7 @@ public class MessageServiceImpl implements MessageService{
     private final MessageRepository messageRepository;
     private final AttachmentRepository attachmentRepository;
     private final FavoriteTopicRepository favoriteTopicRepository;
+
     private final KafkaProducer kafkaProducer;
     private final FileServiceClient fileServiceClient;
 
@@ -74,6 +75,7 @@ public class MessageServiceImpl implements MessageService{
 
             attachmentRepository.saveAll(attachments);
         }
+        messageRepository.save(message);
 
         List<UUID> userIdsWithFavoriteTopic = favoriteTopicRepository.findUserIdsByTopicId(toUUID(request.getTopicId()));
         userIdsWithFavoriteTopic.remove(user.id());
@@ -88,7 +90,6 @@ public class MessageServiceImpl implements MessageService{
             );
         }
 
-        messageRepository.save(message);
         return message.getId();
     }
 

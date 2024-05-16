@@ -1,6 +1,6 @@
 package com.example.notificationservice.service.implementation;
 
-import com.example.common.dto.NotificationMessage;
+import com.example.common.dto.NotificationUserMessage;
 import com.example.notificationservice.entity.Notification;
 import com.example.notificationservice.mapper.NotificationMapper;
 import com.example.notificationservice.repository.NotificationRepository;
@@ -15,7 +15,7 @@ public class KafkaMessageServiceImpl implements KafkaMessageService {
     private final NotificationRepository notificationRepository;
 
     @Override
-    public void processNotification(NotificationMessage message) {
+    public void processNotification(NotificationUserMessage message) {
         System.out.println("Received notification: " + message.toString());
 
         Notification notification = NotificationMapper.mapMessageToNotification(message);

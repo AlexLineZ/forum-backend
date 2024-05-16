@@ -1,11 +1,10 @@
 package com.example.notificationservice.mapper;
 
-import com.example.common.dto.NotificationMessage;
+import com.example.common.dto.NotificationUserMessage;
 import com.example.notificationservice.dto.response.NotificationResponse;
 import com.example.notificationservice.entity.Notification;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class NotificationMapper {
     public static NotificationResponse convertToNotificationResponse(Notification notification) {
@@ -18,9 +17,9 @@ public class NotificationMapper {
         );
     }
 
-    public static Notification mapMessageToNotification(NotificationMessage message) {
+    public static Notification mapMessageToNotification(NotificationUserMessage message) {
         Notification notification = new Notification();
-        notification.setUserId(message.getUserId());
+        notification.setUserId(message.getUser().getUserId());
         notification.setLabel(message.getTitle());
         notification.setMessage(message.getMessage());
         notification.setDate(LocalDateTime.now());

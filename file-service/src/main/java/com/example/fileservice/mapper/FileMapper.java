@@ -1,6 +1,6 @@
 package com.example.fileservice.mapper;
 
-import com.example.common.dto.FileDto;
+import com.example.common.dto.file.FileDto;
 import com.example.fileservice.entity.MetaDataFile;
 import org.springframework.web.multipart.MultipartFile;
 

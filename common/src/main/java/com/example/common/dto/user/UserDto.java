@@ -1,4 +1,4 @@
-package com.example.common.dto;
+package com.example.common.dto.user;
 
 import com.example.common.enums.Role;
 

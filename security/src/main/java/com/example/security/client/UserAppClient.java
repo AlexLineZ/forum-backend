@@ -1,6 +1,6 @@
 package com.example.security.client;
 
-import com.example.common.dto.UserDto;
+import com.example.common.dto.user.UserDto;
 import com.example.security.config.SecurityFeignClientConfiguration;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

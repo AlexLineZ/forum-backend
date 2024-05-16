@@ -1,15 +1,12 @@
 package com.example.forumcore.controller;
 
-import com.example.common.dto.UserDto;
+import com.example.common.dto.user.UserDto;
 import com.example.forumcore.dto.request.category.CategoryCreateRequest;
 import com.example.forumcore.dto.request.category.CategoryUpdateRequest;
 import com.example.forumcore.dto.response.CategoryResponse;
 import com.example.forumcore.enums.CategorySortType;
 import com.example.forumcore.service.category.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

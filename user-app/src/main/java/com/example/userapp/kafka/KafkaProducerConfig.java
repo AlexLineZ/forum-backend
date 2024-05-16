@@ -1,4 +1,4 @@
-package com.example.forumcore.kafka;
+package com.example.userapp.kafka;
 
 import com.example.common.dto.NotificationUserMessage;
 import org.apache.kafka.clients.producer.ProducerConfig;

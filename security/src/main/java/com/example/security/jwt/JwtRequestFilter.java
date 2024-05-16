@@ -1,6 +1,6 @@
 package com.example.security.jwt;
 
-import com.example.common.dto.UserDto;
+import com.example.common.dto.user.UserDto;
 import com.example.security.client.UserAppClient;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;

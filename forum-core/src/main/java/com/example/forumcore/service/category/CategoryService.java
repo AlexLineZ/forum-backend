@@ -1,6 +1,6 @@
 package com.example.forumcore.service.category;
 
-import com.example.common.dto.UserDto;
+import com.example.common.dto.user.UserDto;
 import com.example.forumcore.dto.request.category.CategoryCreateRequest;
 import com.example.forumcore.dto.request.category.CategoryUpdateRequest;
 import com.example.forumcore.dto.response.CategoryResponse;

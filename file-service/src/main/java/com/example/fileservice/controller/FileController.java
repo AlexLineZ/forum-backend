@@ -1,12 +1,11 @@
 package com.example.fileservice.controller;
 
-import com.example.common.dto.FileDto;
-import com.example.common.dto.UserDto;
+import com.example.common.dto.file.FileDto;
+import com.example.common.dto.user.UserDto;
 import com.example.fileservice.service.FileService;
 import com.google.common.net.HttpHeaders;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;

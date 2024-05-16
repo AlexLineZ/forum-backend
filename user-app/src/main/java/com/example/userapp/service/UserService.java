@@ -1,6 +1,6 @@
 package com.example.userapp.service;
 
-import com.example.common.dto.UserDto;
+import com.example.common.dto.user.UserDto;
 import com.example.userapp.dto.TokenResponse;
 import com.example.userapp.dto.request.user.LoginRequest;
 import com.example.userapp.dto.request.user.RegisterRequest;

@@ -1,6 +1,6 @@
 package com.example.notificationservice.config;
 
-import com.example.common.dto.NotificationMessage;
+import com.example.common.dto.NotificationUserMessage;
 import com.example.notificationservice.service.KafkaMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -13,7 +13,7 @@ public class KafkaNotificationListener {
     private final KafkaMessageService kafkaMessageService;
 
     @KafkaListener(topics = "${spring.kafka.topic.notification}", groupId = "${spring.kafka.consumer.group-id}")
-    public void listen(NotificationMessage message) {
+    public void listen(NotificationUserMessage message) {
         kafkaMessageService.processNotification(message);
     }
 }

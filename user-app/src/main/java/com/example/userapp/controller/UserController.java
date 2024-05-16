@@ -1,6 +1,6 @@
 package com.example.userapp.controller;
 
-import com.example.common.dto.UserDto;
+import com.example.common.dto.user.UserDto;
 import com.example.userapp.dto.request.user.UserUpdateRequest;
 import com.example.userapp.dto.response.UserResponse;
 import com.example.userapp.service.UserService;

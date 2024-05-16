@@ -1,6 +1,6 @@
 package com.example.notificationservice.config;
 
-import com.example.common.dto.NotificationMessage;
+import com.example.common.dto.NotificationUserMessage;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,23 +36,23 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "com.example.common.dto.NotificationMessage");
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "com.example.common.dto.NotificationUserMessage");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
         return props;
     }
 
     @Bean
-    public ConsumerFactory<String, NotificationMessage> consumerFactory() {
+    public ConsumerFactory<String, NotificationUserMessage> consumerFactory() {
         return new DefaultKafkaConsumerFactory<>(
                 consumerConfigs(),
                 new StringDeserializer(),
-                new JsonDeserializer<>(NotificationMessage.class)
+                new JsonDeserializer<>(NotificationUserMessage.class)
         );
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, NotificationMessage> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, NotificationMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, NotificationUserMessage> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, NotificationUserMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }

@@ -1,6 +1,6 @@
 package com.example.userapp.service.implementation;
 
-import com.example.common.dto.UserDto;
+import com.example.common.dto.user.UserDto;
 import com.example.common.exception.UserNotFoundException;
 import com.example.security.jwt.JwtTokenUtils;
 import com.example.userapp.dto.TokenResponse;

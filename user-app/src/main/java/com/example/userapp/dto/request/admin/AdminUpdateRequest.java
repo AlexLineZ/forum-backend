@@ -19,8 +19,4 @@ public class AdminUpdateRequest{
     @Size(min = 1, max = 100, message = "Lastname must be at least 1 character and no more than 100")
     @NotBlank(message = "User Lastname cannot be empty")
     private String lastName;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Role role;
 }

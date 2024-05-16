@@ -1,7 +1,7 @@
 package com.example.fileservice.service;
 
-import com.example.common.dto.FileDto;
-import com.example.common.dto.UserDto;
+import com.example.common.dto.file.FileDto;
+import com.example.common.dto.user.UserDto;
 import org.springframework.data.util.Pair;
 import org.springframework.web.multipart.MultipartFile;
 

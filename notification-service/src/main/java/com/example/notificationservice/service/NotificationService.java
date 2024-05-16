@@ -1,6 +1,6 @@
 package com.example.notificationservice.service;
 
-import com.example.common.dto.PageResponse;
+import com.example.common.dto.page.PageResponse;
 import com.example.notificationservice.dto.response.NotificationCountResponse;
 import com.example.notificationservice.dto.response.NotificationResponse;
 import org.springframework.data.domain.Pageable;

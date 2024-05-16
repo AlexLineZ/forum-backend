@@ -1,7 +1,7 @@
 package com.example.forumcore.service.message;
 
-import com.example.common.dto.PageResponse;
-import com.example.common.dto.UserDto;
+import com.example.common.dto.page.PageResponse;
+import com.example.common.dto.user.UserDto;
 import com.example.forumcore.dto.request.message.MessageCreateRequest;
 import com.example.forumcore.dto.request.message.MessageUpdateRequest;
 import com.example.forumcore.dto.response.MessageResponse;
