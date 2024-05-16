@@ -1,5 +1,6 @@
 package com.example.forumcore.kafka;
 
+import com.example.common.dto.NotificationMessage;
 import com.example.common.dto.NotificationUserMessage;
 import com.example.common.enums.NotificationChannel;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +14,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class KafkaProducer {
-    private final KafkaTemplate<String, NotificationUserMessage> kafkaTemplate;
+    private final KafkaTemplate<String, NotificationMessage> kafkaTemplate;
 
-    @Value("${spring.kafka.topic.notification}")
+    @Value("${spring.kafka.topic.message}")
     private String topic;
 
     public void sendMessage(
@@ -25,7 +26,7 @@ public class KafkaProducer {
             List<NotificationChannel> channels,
             Boolean displayInHistory
     ) {
-        NotificationUserMessage message = new NotificationUserMessage(
+        NotificationMessage message = new NotificationMessage(
                 userId,
                 title,
                 content,
