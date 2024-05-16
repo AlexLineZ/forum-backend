@@ -28,4 +28,7 @@ public class Notification {
 
     @Column(name = "read", nullable = false)
     private boolean read = false;
+
+    @Column(name = "display_in_history", nullable = false)
+    private boolean displayInHistory = true;
 }

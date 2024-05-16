@@ -1,4 +1,4 @@
-package com.example.notificationservice.dto;
+package com.example.notificationservice.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

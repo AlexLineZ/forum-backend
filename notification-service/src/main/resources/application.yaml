@@ -9,24 +9,53 @@ jwt:
 
 spring:
   application:
-    name: USER-APP
+    name: NOTIFICATION-APP
+
   cloud:
     discovery:
       enabled: true
+
+  kafka:
+    topic:
+      notification: notification-topic
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: notification-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
   jpa:
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         ddl-auto: validate
+
   datasource:
     url: jdbc:postgresql://localhost:5435/notification
     username: notification
     password: notification
+
   flyway:
     enabled: true
     locations:
       - migrations
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: alex.rashevskiy222@gmail.com
+    password: mlgowogybtytfomo
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    test-connection: true
 
 eureka:
   client:

@@ -2,8 +2,8 @@ package com.example.notificationservice.service.implementation;
 
 import com.example.common.dto.PageResponse;
 import com.example.common.exception.AccessNotAllowedException;
-import com.example.notificationservice.dto.NotificationCountResponse;
-import com.example.notificationservice.dto.NotificationResponse;
+import com.example.notificationservice.dto.response.NotificationCountResponse;
+import com.example.notificationservice.dto.response.NotificationResponse;
 import com.example.notificationservice.entity.Notification;
 import com.example.notificationservice.mapper.NotificationMapper;
 import com.example.notificationservice.repository.NotificationRepository;

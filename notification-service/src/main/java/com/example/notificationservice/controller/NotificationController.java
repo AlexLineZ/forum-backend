@@ -2,14 +2,12 @@ package com.example.notificationservice.controller;
 
 import com.example.common.dto.PageResponse;
 import com.example.common.dto.UserDto;
-import com.example.notificationservice.dto.NotificationCountResponse;
-import com.example.notificationservice.dto.NotificationResponse;
-import com.example.notificationservice.entity.Notification;
+import com.example.notificationservice.dto.response.NotificationCountResponse;
+import com.example.notificationservice.dto.response.NotificationResponse;
 import com.example.notificationservice.enums.NotificationSortType;
 import com.example.notificationservice.service.NotificationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

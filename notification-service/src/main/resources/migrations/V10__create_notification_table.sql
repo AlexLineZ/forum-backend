@@ -4,5 +4,6 @@ CREATE TABLE notifications (
       label VARCHAR(100) NOT NULL,
       message VARCHAR(1024) NOT NULL,
       date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-      read BOOLEAN NOT NULL DEFAULT FALSE
+      read BOOLEAN NOT NULL DEFAULT FALSE,
+      display_in_history BOOLEAN NOT NULL DEFAULT TRUE
 );
