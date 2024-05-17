@@ -24,7 +24,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Transactional
     public PageResponse<NotificationResponse> getNotifications(UUID userId, String search, Pageable pageable) {
-        Page<Notification> notificationsPage = notificationRepository.findByUserIdAndSearch(userId, search, pageable);
+        Page<Notification> notificationsPage = notificationRepository.findByUserIdAndSearch(userId, search, true, pageable);
 
         List<Notification> unreadNotifications = notificationsPage.getContent().stream()
                 .filter(notification -> !notification.isRead())
@@ -52,7 +52,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Transactional(readOnly = true)
     public NotificationCountResponse getUnreadNotificationCount(UUID userId) {
-        long count = notificationRepository.countByUserIdAndRead(userId, false);
+        long count = notificationRepository.countByUserIdAndReadAndDisplayInHistory(userId, false, true);
         return new NotificationCountResponse(count);
     }
 

@@ -24,6 +24,11 @@ spring:
           uri: lb://FILE-SERVICE
           predicates:
             - Path=/api/files/**
+
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/notifications/**
   main:
     web-application-type: reactive
 

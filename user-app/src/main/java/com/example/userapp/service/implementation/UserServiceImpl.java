@@ -1,9 +1,11 @@
 package com.example.userapp.service.implementation;
 
 import com.example.common.dto.user.UserDto;
+import com.example.common.enums.NotificationChannel;
 import com.example.common.enums.Role;
 import com.example.common.exception.CustomDuplicateFieldException;
 import com.example.common.exception.UserNotFoundException;
+import com.example.userapp.config.MessageConfig;
 import com.example.userapp.dto.TokenResponse;
 import com.example.userapp.dto.request.user.LoginRequest;
 import com.example.userapp.dto.request.user.RegisterRequest;
@@ -12,10 +14,10 @@ import com.example.userapp.dto.response.UserResponse;
 import com.example.userapp.entity.ConfirmationToken;
 import com.example.userapp.entity.User;
 import com.example.userapp.exception.CouldNotVerifyEmailException;
+import com.example.userapp.kafka.KafkaProducer;
 import com.example.userapp.mapper.UserMapper;
 import com.example.userapp.repository.ConfirmationTokenRepository;
 import com.example.userapp.repository.UserRepository;
-import com.example.userapp.service.EmailService;
 import com.example.userapp.service.TokenService;
 import com.example.userapp.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,9 +36,9 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final ConfirmationTokenRepository confirmationTokenRepository;
-    private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
+    private final KafkaProducer kafkaProducer;
 
     @Override
     @Transactional
@@ -55,7 +58,15 @@ public class UserServiceImpl implements UserService {
         confirmationToken.setUser(newUser);
         confirmationTokenRepository.save(confirmationToken);
 
-        emailService.sendMessageToEmail(user.getEmail(), confirmationToken.getConfirmationToken());
+        String emailContent = MessageConfig.EMAIL_MESSAGE
+                .replace("{token}", confirmationToken.getConfirmationToken().toString());
+
+        kafkaProducer.sendMessage(
+                UserMapper.mapUserToUserNotification(user),
+                MessageConfig.SUBJECT_MESSAGE,
+                emailContent,
+                List.of(NotificationChannel.EMAIL),
+                false);
 
         return tokenService.getTokens(UserMapper.mapUserToUserDto(newUser));
     }

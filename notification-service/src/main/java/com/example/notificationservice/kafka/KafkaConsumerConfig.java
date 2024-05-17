@@ -1,4 +1,4 @@
-package com.example.notificationservice.config;
+package com.example.notificationservice.kafka;
 
 import com.example.common.dto.NotificationUserMessage;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
