@@ -5,7 +5,7 @@ import com.example.common.enums.NotificationChannel;
 import com.example.notificationservice.entity.Notification;
 import com.example.notificationservice.mapper.NotificationMapper;
 import com.example.notificationservice.repository.NotificationRepository;
-import com.example.notificationservice.service.EmailSender;
+import com.example.notificationservice.sender.EmailSender;
 import com.example.notificationservice.service.KafkaMessageService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;

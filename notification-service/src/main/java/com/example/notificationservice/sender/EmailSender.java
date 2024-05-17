@@ -1,4 +1,4 @@
-package com.example.notificationservice.service;
+package com.example.notificationservice.sender;
 
 import com.example.common.dto.NotificationUserMessage;
 import jakarta.mail.MessagingException;
