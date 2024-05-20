@@ -1,6 +1,7 @@
-package com.example.notificationservice.sender;
+package com.example.notificationservice.sender.implementation;
 
 import com.example.common.dto.NotificationUserMessage;
+import com.example.notificationservice.sender.NotificationSender;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -12,13 +13,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class EmailSender {
+public class EmailSender implements NotificationSender {
     private final JavaMailSender javaMailSender;
 
     @Value("${spring.mail.username}")
     private String emailFrom;
 
-    public void sendMessageToEmail(NotificationUserMessage notification) throws MessagingException {
+    public void send(NotificationUserMessage notification) throws MessagingException {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 

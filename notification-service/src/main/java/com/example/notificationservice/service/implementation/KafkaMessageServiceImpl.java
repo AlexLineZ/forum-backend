@@ -5,7 +5,8 @@ import com.example.common.enums.NotificationChannel;
 import com.example.notificationservice.entity.Notification;
 import com.example.notificationservice.mapper.NotificationMapper;
 import com.example.notificationservice.repository.NotificationRepository;
-import com.example.notificationservice.sender.EmailSender;
+import com.example.notificationservice.sender.NotificationSender;
+import com.example.notificationservice.sender.factory.NotificationSenderFactory;
 import com.example.notificationservice.service.KafkaMessageService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 public class KafkaMessageServiceImpl implements KafkaMessageService {
 
     private final NotificationRepository notificationRepository;
-    private final EmailSender emailSender;
+    private final NotificationSenderFactory notificationSenderFactory;
 
     @Override
     public void processNotification(NotificationUserMessage message) throws MessagingException {
@@ -25,8 +26,13 @@ public class KafkaMessageServiceImpl implements KafkaMessageService {
         Notification notification = NotificationMapper.mapMessageToNotification(message);
         notificationRepository.save(notification);
 
-        if (message.getDeliveryChannels().contains(NotificationChannel.EMAIL)){
-            emailSender.sendMessageToEmail(message);
+        for (NotificationChannel channel : message.getDeliveryChannels()) {
+            NotificationSender sender = notificationSenderFactory.getSender(channel);
+            if (sender != null) {
+                sender.send(message);
+            } else {
+                System.err.println("No sender found for channel: " + channel);
+            }
         }
     }
 }

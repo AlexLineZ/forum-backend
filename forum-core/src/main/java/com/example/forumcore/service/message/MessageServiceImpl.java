@@ -84,7 +84,7 @@ public class MessageServiceImpl implements MessageService{
             kafkaProducer.sendMessage(
                     userId,
                     "Новый пост в вашем избранном топике: " + currentTopic.getName(),
-                    request.getText(),
+                    "Текст поста: " + request.getText(),
                     List.of(NotificationChannel.EMAIL),
                     true
             );

@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableAsync
+@EnableAsync(proxyTargetClass=true)
 @EnableFeignClients(basePackages = { "com.example.security.client"})
 @Import({SecurityConfig.class, JwtRequestFilter.class, JwtTokenUtils.class})
 public class NotificationServiceApplication {

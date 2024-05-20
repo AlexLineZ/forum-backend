@@ -6,6 +6,7 @@ import com.example.notificationservice.dto.response.NotificationCountResponse;
 import com.example.notificationservice.dto.response.NotificationResponse;
 import com.example.notificationservice.enums.NotificationSortType;
 import com.example.notificationservice.service.NotificationService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,7 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
+    @Operation(summary = "Получить и прочитать уведомления")
     @GetMapping
     public ResponseEntity<PageResponse<NotificationResponse>> getNotifications(
             @RequestParam(defaultValue = "0") int page,
@@ -38,11 +40,13 @@ public class NotificationController {
         return ResponseEntity.ok(notificationService.getNotifications(user.id(), search, pageable));
     }
 
+    @Operation(summary = "Получить количество непрочитанных уведомлений")
     @GetMapping("/unread-count")
     public ResponseEntity<NotificationCountResponse> getUnreadNotificationCount(@AuthenticationPrincipal UserDto user) {
         return ResponseEntity.ok(notificationService.getUnreadNotificationCount(user.id()));
     }
 
+    @Operation(summary = "Прочитать уведомления по ID")
     @PutMapping("/read")
     public ResponseEntity<Void> markAsRead(@RequestBody List<UUID> ids, @AuthenticationPrincipal UserDto user) {
         notificationService.markAsRead(ids, user.id());
